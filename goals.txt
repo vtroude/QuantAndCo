@@ -1,0 +1,8 @@
+The first task I tried to accomplish is to:
+
+1- Gather Data
+2- Build technical Indicators
+3- Train ML model to predict market features
+4- Use this prediction in Tradieng Strategy
+
+Currently, there is a code to 

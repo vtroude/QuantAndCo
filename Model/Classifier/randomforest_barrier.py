@@ -12,6 +12,8 @@ from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score, accuracy
 
 from DataPipeline.get_data  import get_ml_bars_data
 
+#######################################################################################################################
+
 def make_model_name(target, symbol, date_test, thres, n_poinst):
     if not isinstance(date_test, str):
         date_test   = date_test.strftime('%Y-%m-%d-%H-%M-%S')
@@ -19,12 +21,14 @@ def make_model_name(target, symbol, date_test, thres, n_poinst):
     return f"rf_classifier_{target}_{symbol}_{date_test}_thres={thres}_n={n_poinst}"
 
 def get_model_path(model_name):
-    return f"Model/{model_name}.joblib"
+    return f"Model/Classifier/Model/{model_name}.joblib"
 
 def get_model(target, symbol, date_test, thres, n_poinst):
     model_name  = make_model_name(target, symbol, date_test, thres, n_poinst)
     
     return load(get_model_path(model_name))
+
+#######################################################################################################################
 
 def train_rf(X, Y, model_name, n_jobs=5, to_load=False):
     # Check if the model has already been trained
@@ -46,6 +50,8 @@ def train_rf(X, Y, model_name, n_jobs=5, to_load=False):
     evaluate_model(clf, X_val, Y_val, model_name, "validation")
 
     return clf
+
+#######################################################################################################################
 
 def evaluate_model(model, X, Y, model_name, data_type):
     # Predict the responses for the given dataset
@@ -93,30 +99,81 @@ def evaluate_model(model, X, Y, model_name, data_type):
     pl.grid()
     pl.savefig(f"Figure/RF_classifier/{model_name}_{data_type}.png")
 
-def train_take_profit_classifiers(date_start, date_end, date_test, symbol, interval, thres=1., n_points=60, to_load=False):
+#######################################################################################################################
+
+def train_take_profit_classifiers(
+                                    date_start: str,
+                                    date_end: str,
+                                    date_test: pd.DatetimeIndex,
+                                    symbol: str,
+                                    interval: str,
+                                    thres: float = 1.,
+                                    n_points: int = 60,
+                                    to_load: bool = False
+                                ) -> None:
+    
+    """
+    We are training random forest to solve two tasks:
+
+    1- Train a random forest to know if the price P_t will hit P_+ or P_- in [t, t+n_points] i.e.
+        T = \inf{s>=t: P_s > P_+ or P_s < P_-} and label 0 if T - t > n_points and 1 otherwise
+    2- If we hit a bar P_+ or P_-, train a random forest to know if the bar hit is P_+ (label = 1) or the bar P_- (label = 0)
+
+    Input:
+        - date_start:   Date from which the data has been gathered in %Y-%m-%d-%H-%M-%S
+        - date_end:     Date to which the data has been gathered in %Y-%m-%d-%H-%M-%S
+        - date_test:    Build the training and validation set for date <= date_test and the test data for date > date_test
+        - symbol:       Asset symbol e.g. 'BTCUSD'
+        - interval:     Candlestick time interval e.g. '1m'
+        - thres:        Threshold such that we defined P_{+/-} = P_t*exp(mean*n_points +/- thres*volatility*\sqrt{n_points})
+        - n_points:     We are searching that if the price will hit a bar in the interval [t, t+n_points]
+        - to_load:      Are we loading an already trained model and fine tune it, or are we training a model from scratch
+    """
+
+    ###############################################################################################
+    """Get Data"""
+    ###############################################################################################
+
+    # Get data, and the labelling if the price hit a bar (hits) and which bar it hits (bar)
     data, hits, bar = get_ml_bars_data(symbol, interval, date_start, date_end, thres=thres, n_points=n_points)
 
+    # Check the number of data points, 
     n_hit, n_take, hit, take    = len(hits[hits==1]), len(bar[bar==1]), len(hits), len(bar)
 
-    print(len(data))
-    print(len(hits), len(hits[hits==1]), len(hits[hits==0]))
-    print(len(bar), len(bar[bar==1]), len(bar[bar==0]))
+    print(f"Number of data points:\t{len(data)}")
+    print(f"Number of Hitting:\t{hit}")
+    print(f"\tPositive:\t{n_hit}")
+    print(f"Number of Positive Hits:\t{n_take}")
 
+    ###############################################################################################
+    """Train Random Forest & Evaluate"""
+    ###############################################################################################
+
+    # If we have enough data
+    # i.e. the price is hitting a bar at least 10% of the time
+    # and we should have at least 30% of bar hit to be positive and negative
     if n_hit >= 0.1*hit and n_take >= 0.3*take and n_take <= 0.7*take:
+        # Separate data sets into testing (out of sample) and training (in sample) data set
         data_test, hits_test, bar_test      = data[data.index > date_test], hits[hits.index > date_test], bar[bar.index > date_test]
         data_train, hits_train, bar_train   = data[data.index <= date_test], hits[hits.index <= date_test], bar[bar.index <= date_test]
 
+        # Format date_test into string
         date_test       = date_test.strftime('%Y-%m-%d-%H-%M-%S')
-        direction_name  = make_model_name("direction", symbol, date_test, thres, n_points)
-        hitting_name    = make_model_name("hitting", symbol, date_test, thres, n_points)
+        # Get model names
+        direction_name  = make_model_name("direction", symbol, date_test, thres, n_points)  # Does it hit the P_+ or P_- bar
+        hitting_name    = make_model_name("hitting", symbol, date_test, thres, n_points)    # Does it hit a bar
 
+        # Train models
         model_direction = train_rf(data_train.loc[bar_train.index].to_numpy(), bar_train.to_numpy(), direction_name, to_load=to_load)
         model_hitting   = train_rf(data_train.loc[hits_train.index].to_numpy(), hits_train.to_numpy(), hitting_name, to_load=to_load)
 
+        # Evaluate models i.e. accuracy, precision, ROC, etc...
         evaluate_model(model_direction, data_test.loc[bar_test.index].to_numpy(), bar_test.to_numpy(), direction_name, "test")
         evaluate_model(model_hitting, data_test.loc[hits_test.index].to_numpy(), hits_test.to_numpy(), hitting_name, "test")
     else:
         print("Not Enough Heterogeneity in the target")
+
+#######################################################################################################################
 
 if __name__ == "__main__":
     date1       = "2021-04-05-23:44:12"

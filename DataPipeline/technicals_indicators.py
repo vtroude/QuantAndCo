@@ -826,6 +826,40 @@ class TechnicalIndicators:
 
     return data
 
+  def measure_draw(self, price: pd.Series) -> pd.DataFrame:
+    
+    if price.iloc[0] > price.iloc[1]:
+      i   = price[price > price.iloc[0]]
+      if len(i) >0:
+        i   = i.index[0]
+      else:
+        i   = -1
+        i   = price[:i].argmin()
+    elif price.iloc[0] < price.iloc[1]:
+      i   = price[price < price.iloc[0]]
+      if len(i) >0:
+        i   = i.index[0]
+      else:
+        i   = -1
+        i   = price[:i].argmax()
+    else:
+      i   = price.index[0]
+
+    return pd.DataFrame({"cum log": [price[i]/price.iloc[0] - 1.], "time start": [price.index[0]], "time end": [i]})
+
+  def get_draw(self, price: pd.Series) -> pd.DataFrame:
+    price_last  = price.shift(1)
+    price_next  = price.shift(-1)
+
+    I       = price.index[(((price > price_last) & (price < price_next)) | ((price < price_last) & (price > price_next)))]
+    bg_wl   = [self.measure_draw(price[i:]) for i in I]
+    if len(bg_wl) > 0:
+      bg_wl   = pd.concat(bg_wl, axis=0, ignore_index=True)
+    else:
+      bg_wl   = pd.DataFrame({"cum log": [0], "time start": [np.nan], "time end": [np.nan]})
+
+    return bg_wl
+
   def get(
           self,
           df: pd.DataFrame,

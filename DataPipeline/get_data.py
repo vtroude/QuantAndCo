@@ -1,7 +1,7 @@
 import numpy    as np
 import pandas   as pd
 
-from make_data  import make_filename
+from DataPipeline.make_data import make_filename
 
 def get_data(symbol, interval, date1, date2):
     data        = pd.read_csv(make_filename(symbol, interval, date1, date2, "ti"), index_col=0)
