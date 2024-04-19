@@ -241,16 +241,6 @@ def backtest_RSI_strategy(price_df: pd.DataFrame, rsi_df: pd.DataFrame, entry_lo
     return df
 
 
-
-
-
-
-
-
-
-
-
-
 #######################################################################################################################
 
 def backtest(symbol: str, date_test: pd.DatetimeIndex, thres: float, n_points: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
