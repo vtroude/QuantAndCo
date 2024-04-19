@@ -163,24 +163,6 @@ def backtest_RSI_strategy(price_df: pd.DataFrame, rsi_df: pd.DataFrame, entry_lo
 
         return exit_conditions
 
-        #if position == 1:
-        #    #condition = any(i > long_thres for i in indicators_lst)
-        #    if any(i > exit_long_thres for i in indicators_lst):
-        #        print(indicators_lst)
-        #        print('>')
-        #        print(exit_long_thres)
-        #        return True
-        
-        #elif position == -1:
-        #    if any(i < exit_short_thres for i in indicators_lst):
-        #        print(indicators_lst)
-        #        print('<')
-        #        print(exit_short_thres)
-        #        return True
-        
-        #else:
-        #    return False
-
     def TP_TL():
         pass
 
@@ -301,6 +283,8 @@ def backtest(symbol: str, date_test: pd.DatetimeIndex, thres: float, n_points: i
     # Build signal
     price["signal"] = hitting.predict_proba(data.to_numpy())[:,-1]
     price["signal"] *= 2.*(direction.predict_proba(data.to_numpy())[:,-1] - 0.5)
+
+    #Why signal twice in a row? Is the first signal getting overriden?
 
     ###############################################################################################
     """Backtest Strategy"""
