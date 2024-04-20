@@ -13,11 +13,11 @@ This repository contains all data related code such as:
 3. Get data from files and format them e.g. _get_data.py_
 4. Build technical indicators e.g. _technicals_indicators.py_
 
-## Model
+### Model
 
 Make ML models to predict market behaviors and/or build trading strategies.
 
-### Classifier
+#### Classifier
 
 Contains training methodology for binary classifier.
 
@@ -25,7 +25,7 @@ E.g. In _randomforest_barrier.py_, we train a RF to estimate the probability for
 
 And contain the methodology to study the feature importance of the inputs e.g. _importance_study.py_
 
-## Strategy
+### Strategy
 
 Contains file to build strategies over data, technical indicators and/or ML.
 

@@ -1,23 +1,18 @@
 import os
-#import sys
 
 import numpy    as np
 import pandas   as pd
 import pylab    as pl
 
-from typing     import Tuple
+from typing     import List, Union
 
-from DataPipeline.get_data                  import get_data_and_bars
 from DataPipeline.technicals_indicators     import TechnicalIndicators
-from Model.Classifier.randomforest_barrier  import get_model
-
-#sys.path.append("/home/virgile/Desktop/General/Packages/")
-#from Indicators.best_gains_worst_losses import best_gains_worst_losses
+from Strategy.strategies                    import rf_bare_strategy
 
 
 #######################################################################################################################
 
-def back_test_thresh(price: pd.DataFrame, n_points: int, thresh: float) -> pd.Series:
+def backtest(price: pd.DataFrame, n_points: int, thresh: float) -> pd.Series:
     """
     Backtest a signal
 
@@ -87,36 +82,17 @@ def back_test_thresh(price: pd.DataFrame, n_points: int, thresh: float) -> pd.Se
 
 #######################################################################################################################
 
-def backtest(symbol: str, date_test: pd.DatetimeIndex, thres: float, n_points: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def backtest_thresh(price: pd.DataFrame, n_points: int, strategy_thresh: Union[List[float], np.ndarray]) -> pd.DataFrame:
     """
     Backtest a RF strategy for a given volatility multiplier (thres) and a given horizon (n_points) over different signal threshold
 
     Input:
-        - symbol:   Asset symbol e.g. 'BTCUSD'
-        - thres:    Threshold such that we defined P_{+/-} = P_t*exp(mean*n_points +/- thres*volatility*\sqrt{n_points})
-        - n_points: We are searching that if the price will hit a bar in the interval [t, t+n_points]
-    
+        - price:            price + signal timeseries
+        - n_points:         We are searching that if the price will hit a bar in the interval [t, t+n_points]
+        - strategy_thresh:  List of float in [0,1] such that a signal is launched if signal > thresh
     Return:
-        - price:    Price time-series
         - wealth:   Wealth of the strategy for different signal threshold
     """
-
-
-    ###############################################################################################
-    """Initialize"""
-    ###############################################################################################
-
-    # Load trained model
-    hitting     = get_model("hitting", symbol, date_test, thres, n_points)
-    direction   = get_model("direction", symbol, date_test, thres, n_points)
-
-    # Get data (features) to do prediction
-    data, price = get_data_and_bars(symbol, interval, date1, date2, thres=thres, n_points=n_points)
-    data, price = data[data.index > date_test], price[price.index > date_test]
-
-    # Build signal
-    price["signal"] = hitting.predict_proba(data.to_numpy())[:,-1]
-    price["signal"] *= 2.*(direction.predict_proba(data.to_numpy())[:,-1] - 0.5)
 
     ###############################################################################################
     """Backtest Strategy"""
@@ -125,12 +101,12 @@ def backtest(symbol: str, date_test: pd.DatetimeIndex, thres: float, n_points: i
     # Get different signal threshold
     strategy_thresh = [0.1, 0.3, 0.5, 0.7, 0.9, 1.]
     # Loop over all signal threshold and get the wealth time series
-    wealth  = pd.concat([back_test_thresh(price, n_points, thresh=th) for th in strategy_thresh], axis=1)
+    wealth  = pd.concat([backtest(price, n_points, thresh=th) for th in strategy_thresh], axis=1)
     # Rename columns
     wealth.columns  = [f"$\epsilon={np.round(th,2)}$" for th in strategy_thresh]
 
-    # Return price and wealth data
-    return price, wealth
+    # Return wealth data
+    return wealth
 
 #######################################################################################################################
 
@@ -247,8 +223,10 @@ if __name__ == "__main__":
     for th in thres:
         for n in n_points:
             try:
+                # Get price + trading signal in the same DataFrame
+                price   = rf_bare_strategy(symbol, date_test, th, n, interval, date1, date2)
                 # Get backtest over different signal threshold
-                price, wealth   = backtest(symbol, date_test, th, n)
+                price, wealth   = backtest_thresh(price, n)
             except:
                 # If any error return None
                 wealth = None

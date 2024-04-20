@@ -451,8 +451,8 @@ class TechnicalIndicators:
         raise ValueError(f"{para_name} must be float")
 
   @staticmethod
-  def append_from_parallelize(df: pd.DataFrame, processes: list, n_process: int = 5):
-    with ProcessPoolExecutor(max_workers=np.minimum(n_process, len(processes))) as executor:
+  def append_from_parallelize(df: pd.DataFrame, processes: list, n_jobs: int = 5):
+    with ProcessPoolExecutor(max_workers=np.minimum(n_jobs, len(processes))) as executor:
       futures = [executor.submit(p, df) for p in processes]
       results = [f.result() for f in futures]
 
@@ -866,7 +866,7 @@ class TechnicalIndicators:
           df_last: Optional[pd.DataFrame] = None,
           span: Union[float, int, list, np.ndarray] = 10,
           stat_span: Union[float, int, list, np.ndarray] = 20,
-          n_processes: int = 5,
+          n_jobs: int = 5,
           ) -> pd.DataFrame:
     """
     Calculate various technical indicators on a pandas DataFrame containing OHLCV data.
@@ -905,43 +905,43 @@ class TechnicalIndicators:
     # With get_price_pressure, Get:
     #       Buying Pressure = Close_t - min(Close_{t-1}, Low_t)
     #       True Range = max(Close_{t-1}, High_t) - Close_t
-    df  = self.append_from_parallelize(df, processes=[self.get_price_flow, self.get_price_pressure], n_process = np.minimum(n_processes, 2))
+    df  = self.append_from_parallelize(df, processes=[self.get_price_flow, self.get_price_pressure], n_jobs = np.minimum(n_jobs, 2))
 
     # Money Based Point Indicators
     df  = self.append_from_parallelize(df,
                                         processes=[self.get_diffAdi,
                                                   self.get_force_index,
                                                   partial(self.get_ease_of_movement, df_last=df_last)],
-                                        n_process=np.minimum(n_processes, 3))
+                                        n_jobs=np.minimum(n_jobs, 3))
 
     df  = self.append_from_parallelize(df,
                                         processes=[self.get_diffAdi,
                                                   self.get_force_index,
                                                   partial(self.get_ease_of_movement, df_last=df_last)],
-                                        n_process=np.minimum(n_processes, 3))
+                                        n_jobs=np.minimum(n_jobs, 3))
     
     # Money Based Average Indicators
     money_based_processes = [partial(self.get_chaikin_money_flow, df_last=df_last, span=s) for s in span]
     money_based_processes += [partial(self.get_ewm_ease_of_movement, df_last=df_last, span=s) for s in span]
     money_based_processes += [partial(self.get_money_flow, df_last=df_last, span=s) for s in span]
-    df  = self.append_from_parallelize(df, processes=money_based_processes, n_process=n_processes)
+    df  = self.append_from_parallelize(df, processes=money_based_processes, n_jobs=n_jobs)
 
     # Money Based Indicators (3 + 3*len(span))
     money_cols  = ["DiffADI", "FI", "EOM"] + [f"{e}-{s}"for e in ["CMF", "EOM", "MFI"] for s in span]
 
     # Momentum Based Average Indicators
     strength_processes  = [partial(self.get_buying_pressure_strength, df_last=df_last, span=s) for s in list(set([i*s for i in [1, 2, 4] for s in span]))]
-    df  = self.append_from_parallelize(df, processes=strength_processes, n_process=n_processes)
+    df  = self.append_from_parallelize(df, processes=strength_processes, n_jobs=n_jobs)
     
     momentum_based_processes  = [partial(self.get_ultimate_oscillator, span=s) for s in span]
     momentum_based_processes  += [partial(self.get_stochastic_oscillator, df_last=df_last, span=s) for s in span]
     momentum_based_processes  += [partial(self.get_relative_strength, df_last=df_last, span=s) for s in span]
     momentum_based_processes  += [partial(self.get_true_strength, df_last=df_last, span=s) for s in span]
-    df  = self.append_from_parallelize(df, processes=momentum_based_processes, n_process=n_processes)
+    df  = self.append_from_parallelize(df, processes=momentum_based_processes, n_jobs=n_jobs)
 
     stochastic_processes  = [partial(self.get_stochastic_index, index="RSI", df_last=df_last, span=s) for s in span]
     stochastic_processes  += [partial(self.get_stochastic_index, index="TSI", df_last=df_last, span=s) for s in span]
-    df  = self.append_from_parallelize(df, processes=stochastic_processes, n_process=n_processes)
+    df  = self.append_from_parallelize(df, processes=stochastic_processes, n_jobs=n_jobs)
 
     # Momentum Based Indicators ()
     momentum_cols   = [f"{e}-{s}"for e in ["UO", "SO", "RSI", "StochRSI", "TSI", "StochTSI"] for s in span]
@@ -955,7 +955,7 @@ class TechnicalIndicators:
     stat_process  = [partial(self.get_quantile, q=q, span=s) for q in [0.05, 0.25, 0.5, 0.75, 0.95] for s in stat_span]
     stat_process  += [partial(self.get_skweness, span=s) for s in stat_span]
     stat_process  += [partial(self.get_kurtosis, span=s) for s in stat_span]
-    ret = self.append_from_parallelize(ret, processes=stat_process, n_process=n_processes)
+    ret = self.append_from_parallelize(ret, processes=stat_process, n_jobs=n_jobs)
 
     stat_process  = [partial(self.get_mean, span=s) for s in stat_span]
     stat_process  += [partial(self.get_std, span=s) for s in stat_span]
@@ -963,7 +963,7 @@ class TechnicalIndicators:
     stat_process  += [partial(self.get_std_low, span=s) for s in stat_span]
     stat_process  += [partial(self.get_all_slope_up, span=s) for s in stat_span]
     stat_process  += [partial(self.get_all_slope_low, span=s) for s in stat_span]
-    ret = self.append_from_parallelize(ret, processes=stat_process, n_process=n_processes)
+    ret = self.append_from_parallelize(ret, processes=stat_process, n_jobs=n_jobs)
     
     statistics_cols = [f"{e}-{s}"for e in ["mean", "std", "std(+)", "std(-)", "slope(+)", "slope(-)", "skw", "kts"] + [f"{i}%-Q" for i in [5, 25, 50, 75, 95]] for s in stat_span]
 
