@@ -1,23 +1,53 @@
 import numpy    as np
 import pandas   as pd
 
+from typing import List, Tuple
+
 from DataPipeline.make_data import make_filename
 
-def get_data(symbol, interval, date1, date2):
-    data        = pd.read_csv(make_filename(symbol, interval, date1, date2, "ti"), index_col=0)
-    data.index  = pd.to_datetime(data.index, format="ISO8601")
+#######################################################################################################################
 
+def get_data(symbol: str, interval: str, date1: str, date2: str):
+    """
+    Get all technical indicators from date1 to dat2 for a given time interval
+
+    symbol:     Symbol of the data e.g. 'BTCUSDT'
+    interval:   Time interval over which the candle stick is build e.g. '1m', '1h', '1d', '1w'
+    date1:      Time from which we gather the data
+    date2:      Time to which we gather the data
+    """
+
+    # Get technical indicators fron csv file
+    data        = pd.read_csv(make_filename(symbol, interval, date1, date2, "ti"), index_col=0)
+    # Set datetime index
+    data.index  = pd.to_datetime(data.index, format="ISO8601")
+    # Adjust columns name to precise the time inteval
     data.columns    = [f"{d}-{interval}" for d in data.columns]
 
+    # Return technical indicators and dropna
     return data.sort_index().dropna(axis=1, how="all")
 
-def get_all_data(symbol, interval, date1, date2):
+#######################################################################################################################
+
+def get_all_data(symbol: str, interval: List[str], date1: str, date2: str) -> pd.DataFrame:
+    """
+    Get all technical indicators from date1 to date2 over different timescale
+
+    symbol:     Symbol of the data e.g. 'BTCUSDT'
+    interval:   Time interval over which the candle stick is build e.g. '1m', '1h', '1d', '1w'
+    date1:      Time from which we gather the data
+    date2:      Time to which we gather the data
+    """
+
+    # Get technical indicators over different timescale and match them
     data    = get_data(symbol, interval[0], date1, date2)
     for i in interval[1:]:
         data_   = get_data(symbol, i, date1, date2)
         data    = pd.merge_asof(data, data_, left_index=True, right_index=True, direction='backward')
 
     return data.dropna(axis=1, how="all")
+
+#######################################################################################################################
 
 def get_bars(price, data, interval, n_points=60, thres=2):
     mean    = n_points*(data[f"mean-20-{interval}"] - 0.5*data[f"std-20-{interval}"]*data[f"std-20-{interval}"] )
@@ -57,22 +87,82 @@ def get_targets(price, n_points=60):
 
     return hits.dropna(), bar.dropna()
 
-def get_data_and_bars(symbol, interval, date1, date2, thres=2, n_points=60):
-    data    = get_all_data(symbol, interval, date1, date2).dropna()
+#######################################################################################################################
+
+def get_price_data(
+                    symbol: str,
+                    interval: str,
+                    date1: str,
+                    date2: str,
+                    ) -> pd.DataFrame:
+    """
+    Get OHLC price
+
+    symbol:     Symbol of the data e.g. 'BTCUSDT'
+    interval:   Time interval over which the candle stick is build e.g. '1m', '1h', '1d', '1w'
+    date1:      Time from which we gather the data
+    date2:      Time to which we gather the data
+    """
+
+    ###############################################################################################
+    """ Get OHLC Data """
+    ###############################################################################################
+
+    # Get OHLC from csv data
     price   = pd.read_csv(make_filename(symbol, interval[0], date1, date2, "ohlc"), index_col=0)
+    # Make datetime index
+    price.index = pd.to_datetime(price.index, format="ISO8601")
+    # Format OHLC columns name
+    price   = price.rename(columns={o.lower(): o for o in ['Open', 'High', 'Low', 'Close', 'Volume']})
+
+    return price
+
+#######################################################################################################################
+
+def get_data_and_bars(
+                        symbol: str,
+                        interval: List[str],
+                        date1: str,
+                        date2: str,
+                        thres: float = 2,
+                        n_points: int = 60
+                    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Get all technical indicators from date1 to date2 over different timescale
+
+    symbol:     Symbol of the data e.g. 'BTCUSDT'
+    interval:   Time interval over which the candle stick is build e.g. '1m', '1h', '1d', '1w'
+    date1:      Time from which we gather the data
+    date2:      Time to which we gather the data
+    thres:      volatitility threshold / multiplier to define take profit / stop loss bars
+    n_points:   Time horizon in number of point
+    """
+
+    ###############################################################################################
+    """ Get Data from csv file """
+    ###############################################################################################
+
+    data    = get_all_data(symbol, interval, date1, date2).dropna()
+    price   = get_price_data(symbol, interval[0], date1, date2)
     
-    price.index = pd.to_datetime(price.index, format="ISO8601")   # "%Y-%m-%d %H:%M:%S")
-    price       = price.rename(columns={o.lower(): o for o in ['Open', 'High', 'Low', 'Close', 'Volume']})
-    price       = price.loc[data.index]
+    ###############################################################################################
+    """ Format Data """
+    ###############################################################################################
+
+    # Get Take Profit / Stop Loss bars based on volatility threshold
     price       = get_bars(price, data, interval[0], thres=thres, n_points=n_points)
 
     return data, price
+
+#######################################################################################################################
 
 def get_ml_bars_data(symbol, interval, date1, date2, thres=2, n_points=60):
     data, price = get_data_and_bars(symbol, interval, date1, date2, thres=thres, n_points=n_points)
     hits, bar   = get_targets(price)
 
     return data, hits, bar
+
+#######################################################################################################################
 
 if __name__ == "__main__":
     date1       = "2021-04-05-23:44:12"
