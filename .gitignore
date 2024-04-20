@@ -4,3 +4,9 @@
 *.joblib
 *.pkl
 *.env
+Data/*
+Score/*
+Model/Classifier/Model/*
+Model/Classifier/Score/*
+Model/Classifier/Shapley/*
+Figure/*
