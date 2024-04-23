@@ -2,7 +2,7 @@ import os
 
 import numpy    as np
 import pandas   as pd
-import pylab    as pl
+import matplotlib.pylab    as pl
 
 from typing     import List, Union
 
@@ -82,7 +82,167 @@ def backtest(price: pd.DataFrame, n_points: int, thresh: float) -> pd.Series:
 
 #######################################################################################################################
 
+<<<<<<<< HEAD:Backtest/backtest_old.py
+def backtest_RSI_strategy(price_df: pd.DataFrame, rsi_df: pd.DataFrame, entry_long_thres: float, entry_short_thres:float, 
+                          exit_long_thres: float, exit_short_thres: float, leverage=1) -> pd.DataFrame:
+    """
+    Backtest trading strategy based on Relative Strength Indicators (RSI).
+    It is a mean-reverting strategy. Long signal is sent when price is below a certain threshold, and 
+    conversely short signal is sent when price is above a certain threshold.
+
+    Input:
+        - price_df:    Close price time-series. Index must be timestamp.
+        - rsi_df:      Time-series containing one or more Stochastic RSI indicators (with different spans). Must only contain Stochastic RSI columns + timestamp as index.
+        - entry_long_thresh:   Between O and 1. When all indicators are below this threshold, long signal is sent.
+        - entry_short_thres:   Between 0 and 1. When all indicators are above this threshold, short signal is sent.
+        - exit_long_thres:     Between 0 and 1. When any indicator is above this threshold, if a long position is currently open, it will be closed on the next available bar.
+        - exit_short_thres:    Between 0 and 1. When any indicator is below this threshold, if a short position is currently open, it will be closed on the next available bar.
+        - leverage:            Float. Leverage used to amplify the positions.
+    
+    Return:
+        - Wealth:   Strategy portfolio value
+
+
+    TO DO:
+    - Add commission and slippage (also for leverage)
+    """
+
+    ## First, we make sure timestamp is index in both price_df and rsi_df
+
+    if price_df.index.name != 'timestamp':
+        if 'timestamp' not in price_df.columns:
+            raise ValueError('"timestamp" column missing in price_df')
+        else:
+            price_df['timestamp'] = pd.to_datetime(price_df['timestamp'])
+            price_df.set_index('timestamp', inplace=True)
+
+    if rsi_df.index.name != 'timestamp':
+        if 'timestamp' not in rsi_df.columns:
+            raise ValueError('"timestamp" column missing in rsi_df')
+        else:
+            rsi_df['timestamp'] = pd.to_datetime(rsi_df['timestamp'])
+            rsi_df.set_index('timestamp', inplace=True)
+    
+
+    # 2. Combining price_df and rsi_df 
+
+    df = pd.merge(price_df, rsi_df, right_index=True, left_index=True)
+
+    # 3. We get rid of NaNs -> this ensures we will only start backtesting once all the indicators are ready
+
+    df.dropna(subset=rsi_df.columns, inplace=True)
+
+    #4. Signal generation
+
+    def entry_signal(indicators_lst, entry_long_thres, entry_short_thres):
+        """
+        If all indicators are above entry_short_thres -> sends short signal (returns -1)
+        If all indicators are below long_entry_thres -> sends long signal (returns 1)
+        Else returns 0
+        """
+        if all(i > entry_short_thres for i in indicators_lst):
+            return -1
+        elif all(i < entry_long_thres for i in indicators_lst):
+            return 1
+        else: 
+            return 0
+    
+    def exit_signal(position, indicators_lst, exit_long_thres, exit_short_thres):
+
+        """
+        If previous position is long (1), returns exit signal if any indicator is above exit_long_thres
+        If previous position is short (-1), returns exit signal if any indicator is below exit_short_thres
+        Else returns False.
+        """
+
+        exit_conditions = (position == 1 and any(i > exit_long_thres for i in indicators_lst)) or (position == -1 and any(i < exit_short_thres for i in indicators_lst))
+
+        return exit_conditions
+
+    def TP_TL():
+        pass
+
+    def update_wealth(previous_wealth, position, buy_and_hold_return, leverage):
+        return previous_wealth * (1 + position * buy_and_hold_return * leverage)
+
+    def calculate_trade_return(position, entry_price, exit_price, leverage, commission_fees=0., slippage_fees=0.):
+        return position * (exit_price/entry_price - 1) * leverage
+
+
+
+    # 5. Backtesting
+    i0              = 1     # Start at index 1
+    df["Wealth"] = 1.0    # Initialize Wealth / Portfolio value
+    position = 0 #Initial position is 0 (Cash)
+    df["Realized_Return"] = 0.0
+    df['position'] = 0
+    df['BuyHold_Return'] = df['Close'].pct_change()
+
+    ###############################################################################################
+    """ Apply strategy """
+    ###############################################################################################
+
+    # Loop over price time-series
+    while i0 < len(df) - 1:
+        ### Entry conditions: If all indicators are above or below
+        ### Exit conditions: If any indicator is above or below
+
+        rsi_indicators = df.iloc[i0][rsi_df.columns].values.tolist()
+        wealth = df.loc[df.index[i0], "Wealth"]
+        buy_and_hold_return = df.loc[df.index[i0], "BuyHold_Return"]
+
+        if position == 0:
+            position  = entry_signal(rsi_indicators, entry_long_thres, entry_short_thres)
+            if position != 0:
+                entry_price = df.iloc[i0+1]['Close'] #When entry signal is observed at i0, trade is entered at i0+1
+                if position == 1:
+                    trade = 'Long'
+                else:
+                    trade = 'Short'
+                print(f'{trade} Trade entered at entry price: {entry_price}')
+
+        if position != 0:
+            signal_to_exit = exit_signal(position, rsi_indicators, exit_long_thres, exit_short_thres)
+            if signal_to_exit == True:
+                exit_price = df.iloc[i0+1]['Close'] #When exit signal is observed at i0, trade is exited at i0+1
+                trade_return = calculate_trade_return(position, entry_price, exit_price, leverage)
+                print(f'Trade exited at exit price: {exit_price}')
+                print(f'Return of trade with leverage {leverage}: {trade_return}')
+                df.loc[df.index[i0+1], "Realized_Return"] = trade_return
+
+                position = 0
+
+        
+        df.loc[df.index[i0+1], "position"] = position #Position is updated at i0+1 based on signal observed at i0
+        df.loc[df.index[i0+1], "Wealth"] = update_wealth(wealth, position, buy_and_hold_return, leverage)
+        
+        i0+=1
+    
+    if position != 0: #If a position is still open at last bar, close it
+        exit_price = df.iloc[i0+1]['Close']
+        trade_return = calculate_trade_return(position, entry_price, exit_price, leverage)
+        position = 0
+        df.loc[df.index[i0+1], "Realized_Return"] = trade_return
+        df.loc[df.index[i0+1], "position"] = position #Position is updated at i0+1 based on signal observed at i0
+        final_wealth = update_wealth(wealth, position, buy_and_hold_return, leverage)
+        df.loc[df.index[i0+1], "Wealth"] = final_wealth
+        print(f'Final wealth: {final_wealth}')
+
+    n_bars = i0
+
+
+    #df['position_change'] = df['position'].diff() #Position at T+1 minus Position at T
+
+
+    return df
+
+
+#######################################################################################################################
+
+def backtest(symbol: str, date_test: pd.DatetimeIndex, thres: float, n_points: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
+========
 def backtest_thresh(price: pd.DataFrame, n_points: int, strategy_thresh: Union[List[float], np.ndarray]) -> pd.DataFrame:
+>>>>>>>> virgile_branch:Strategy/backtest_virgile.py
     """
     Backtest a RF strategy for a given volatility multiplier (thres) and a given horizon (n_points) over different signal threshold
 
@@ -94,6 +254,28 @@ def backtest_thresh(price: pd.DataFrame, n_points: int, strategy_thresh: Union[L
         - wealth:   Wealth of the strategy for different signal threshold
     """
 
+<<<<<<<< HEAD:Backtest/backtest_old.py
+
+    ###############################################################################################
+    """Initialize"""
+    ###############################################################################################
+
+    # Load trained model
+    hitting     = get_model("hitting", symbol, date_test, thres, n_points)
+    direction   = get_model("direction", symbol, date_test, thres, n_points)
+
+    # Get data (features) to do prediction
+    data, price = get_data_and_bars(symbol, interval, date1, date2, thres=thres, n_points=n_points)
+    data, price = data[data.index > date_test], price[price.index > date_test]
+
+    # Build signal
+    price["signal"] = hitting.predict_proba(data.to_numpy())[:,-1]
+    price["signal"] *= 2.*(direction.predict_proba(data.to_numpy())[:,-1] - 0.5)
+
+    #Why signal twice in a row? Is the first signal getting overriden?
+
+========
+>>>>>>>> virgile_branch:Strategy/backtest_virgile.py
     ###############################################################################################
     """Backtest Strategy"""
     ###############################################################################################
