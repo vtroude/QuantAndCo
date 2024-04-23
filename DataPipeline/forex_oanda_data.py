@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     load_dotenv()
 
-    client = oandapyV20.API(access_token=os.getenv("ONDA_API_KEY"))
+    client = oandapyV20.API(access_token=os.getenv("OANDA_API_KEY"))
 
     data    = fetch_candlesticks(client, symbol, interval, str(start_time), str(end_time))
 
