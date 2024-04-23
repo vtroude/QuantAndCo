@@ -1,0 +1,3 @@
+PAIRS = [
+    "EUR_USD", "EUR_CHF", "EUR_GBP", "USD_CHF", "GBP_USD", "AUD_USD"
+]

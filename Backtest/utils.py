@@ -3,6 +3,18 @@ import numpy as np
 from matplotlib import pylab as pl
 import os
 
+def market_trading_rules(market):
+    if market == 'forex':
+        n_trading_hours = 24
+        n_trading_days = 252
+    elif market == 'crypto':
+        n_trading_hours = 24
+        n_trading_days = 365
+    else:
+        raise ValueError(f'{market} not available. Please choose "crypto" or "forex"')
+    
+    return n_trading_hours, n_trading_days
+
 def convert_interval(interval, n_trading_hours, n_trading_days, n_years):
     if interval in ['1m', '5m', '30m']:
         interval = interval[:-1]
@@ -19,7 +31,28 @@ def convert_interval(interval, n_trading_hours, n_trading_days, n_years):
         return n_trading_months * n_years
     else:
         raise ValueError (f'Interval {interval} not covered')
+    
+def check_column_index(df, column):
+    if df.index.name != column:
+        if column not in df.columns:
+            raise ValueError(f'{column} column missing from dataframe')
+        else:
+            df[column] = pd.to_datetime(df[column])
+            df.set_index(column, inplace=True)
 
+def check_expected_bars(df, interval, n_trading_hours, n_trading_days):
+    start_date = df.index[0]
+    end_date = df.index[-1]
+    time_delta = end_date - start_date
+    n_years  = time_delta.days / 365.25 + time_delta.seconds / (365.25 * 24 * 3600)
+    expected_n_bars = convert_interval(interval, n_trading_hours, n_trading_days, n_years)
+    n_bars = len(df)
+    delta_n_bars = (n_bars - expected_n_bars) / expected_n_bars
+    if abs(delta_n_bars) > 0.05:
+        print('Dataset is missing more than 5% of expected bars in this time frequency')
+    
+    return n_bars, n_years
+    
 def backtest_metrics(backtest_df:pd.DataFrame, interval:str, n_trading_hours:float, n_trading_days:int,
                      wealth_column='Wealth', buy_hold_column='BuyHold_Return') -> list:
 
