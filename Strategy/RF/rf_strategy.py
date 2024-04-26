@@ -10,7 +10,7 @@ from Model.Classifier.randomforest_barrier  import get_model
 
 class RF_strategy():
     
-    def __init__(self, symbol: str, interval: str, date_test: pd.DatetimeIndex, thres: float, n_points: int) -> None:
+    def __init__(self, symbol: str, interval: str, date_test: pd.DatetimeIndex, thres: float, n_points: int, date1: str = None, date2: str = None, price: pd.DataFrame = None, data: pd.DataFrame = None, signal_thresh: float = 0.) -> None:
         """
         Get a RF strategy for a given volatility multiplier (thres) and a given horizon (n_points) over different signal threshold
 
@@ -20,6 +20,8 @@ class RF_strategy():
             - date_test:    date from which we compute the signal to backtest
             - thres:        Threshold such that we defined P_{+/-} = P_t*exp(mean*n_points +/- thres*volatility*\sqrt{n_points})
             - n_points:     We are searching that if the price will hit a bar in the interval [t, t+n_points]
+            - date1:        Date from which the data has been gathered in %Y-%m-%d-%H-%M-%S
+            - date2:        Date to which the data has been gathered in %Y-%m-%d-%H-%M-%S
         
         Return:
             - price:    Price time-series with (portfolio) weights in [-1,1]
@@ -37,11 +39,12 @@ class RF_strategy():
         assert isinstance(n_points, int) and n_points > 0, "'n_points' should be a positive integer"
 
         # save strategy symbol
-        self.symbol     = symbol        # Symbol over which models are trained
-        self.interval   = interval      # candlestick interval over which models are trained
-        self.date_test  = date_test     # date up to which the model is trained
-        self.thres      = thres         # threshold to define the take profit and stop loss bars
-        self.n_points   = n_points      # number of points to define the stop time
+        self.symbol         = symbol            # Symbol over which models are trained
+        self.interval       = interval          # candlestick interval over which models are trained
+        self.date_test      = date_test         # date up to which the model is trained
+        self.thres          = thres             # threshold to define the take profit and stop loss bars
+        self.n_points       = n_points          # number of points to define the stop time
+        self.signal_thresh  = signal_thresh     # Signal threshold
 
         ###############################################################################################
         """ Get Model """
@@ -50,6 +53,21 @@ class RF_strategy():
         # Load trained model
         self.hitting    = get_model("hitting", symbol, date_test, thres, n_points)      # model to predict if we are hitting a bar
         self.direction  = get_model("direction", symbol, date_test, thres, n_points)    # model to predict which bar we will hit
+
+        ###############################################################################################
+        """ Get Data """
+        ###############################################################################################
+
+        if not price is None:
+            self.price  = price
+        if not data is None:
+            self.data   = data
+            self.weight = self.get_weight(self.data)
+
+
+        if data is None and price is None and not date1 is None and not date2 is None:
+            self.prepare_backtest(date1, date2)
+            self.weight = self.get_weight(self.data)
 
     #########################################################################################################
 
@@ -175,13 +193,9 @@ class RF_strategy():
 
     #########################################################################################################
 
-    def get_backtest_signal(self, date1: str, date2: str, signal_thresh: float) -> pd.Series:
+    def generate_signals(self) -> pd.Series:
 
-        # Load data from database
-        if not self.price:
-            self.prepare_backtest(date1, date2)
+        if not self.weight:
+            self.weight = self.get_weight(self.data)
         
-        weight  = self.get_weight(self.data)
-        signal  = self.get_signal(self.price, weight, signal_thresh)
-
-        return signal
+        return self.get_signal(self.price, self.weight, self.signal_thresh)

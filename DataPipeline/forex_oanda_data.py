@@ -1,7 +1,13 @@
+import asyncio
+
 import pandas   as pd
+
+import concurrent.futures
 
 import oandapyV20
 import oandapyV20.endpoints.instruments as instruments
+import oandapyV20.endpoints.pricing     as pricing
+import oandapyV20.endpoints.accounts    as accounts
 
 #######################################################################################################################
 
@@ -62,10 +68,64 @@ def fetch_candlesticks(client: oandapyV20.API, symbol: str, interval: str, start
         return df
     except:
         return None
+    
 
 #######################################################################################################################
 
-if __name__ == "__main__":
+
+async def websocket(symbols: str):
+    """
+    Create a Forex Websocket
+    
+    Input:
+        - symbols:  list of symbols as a string format e.g. 'EUR_USD,AUD_USD'
+    
+    Return:
+        - data stream
+    """
+
+    import os
+
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    ###########################################################################################
+    """ Set-up Client """
+    ###########################################################################################
+
+    client = oandapyV20.API(access_token=os.getenv("OANDA_API_KEY"))
+
+    r   = accounts.AccountList()
+    client.request(r)
+
+    account_id  = r.response['accounts'][0]['id']
+
+    ###########################################################################################
+    """ Open Websocket """
+    ###########################################################################################
+
+    # Request Price Stream data
+    def get_stream():
+        r = pricing.PricingStream(accountID=account_id, params={"instruments": symbols})
+        return client.request(r)
+
+    loop    = asyncio.get_running_loop()
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        response    = await loop.run_in_executor(pool, get_stream)
+        for ticks in response:
+            yield ticks
+
+
+#######################################################################################################################
+
+
+#######################################################################################################################
+""" Test Method """
+#######################################################################################################################
+
+
+def test_fetch_candlestick() -> None:
     import os
     import time
 
@@ -80,9 +140,21 @@ if __name__ == "__main__":
 
     load_dotenv()
 
-    client = oandapyV20.API(access_token=os.getenv("OANDA_API_KEY"))
+    client  = oandapyV20.API(access_token=os.getenv("OANDA_API_KEY"))
 
     data    = fetch_candlesticks(client, symbol, interval, str(start_time), str(end_time))
 
     print(data)
+
+
+if __name__ == "__main__":
+    
+    async def process_streams():
+        async for ticks in websocket("EUR_USD,AUD_USD"):
+            print(ticks)
+    
+    #asyncio.run(main())
+
+    loop    = asyncio.get_event_loop()
+    loop.run_until_complete(process_streams())
 
