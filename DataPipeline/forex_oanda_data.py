@@ -57,6 +57,8 @@ def fetch_candlesticks(client: oandapyV20.API, symbol: str, interval: str, start
 
         # Set the contenet of the DataFrame to be float
         df    = df[['Open', 'High', 'Low', 'Close', 'Volume']].astype(float)
+
+        print('Data was successfully downloaded.')
         
         # Return candlestick
         return df
@@ -80,7 +82,7 @@ if __name__ == "__main__":
 
     load_dotenv()
 
-    client = oandapyV20.API(access_token=os.getenv("ONDA_API_KEY"))
+    client = oandapyV20.API(access_token=os.getenv("OANDA_API_KEY"))
 
     data    = fetch_candlesticks(client, symbol, interval, str(start_time), str(end_time))
 
