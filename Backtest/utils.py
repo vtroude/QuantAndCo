@@ -75,7 +75,9 @@ def check_column_index(df, column):
             raise ValueError(f'{column} column missing from dataframe')
         else:
             df[column] = pd.to_datetime(df[column])
-            df.set_index(column, inplace=True)
+            df = df.set_index(column)
+    
+    return df
 
 def check_expected_bars(df, interval, n_trading_hours, n_trading_days):
     start_date = df.index[0]
