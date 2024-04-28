@@ -37,6 +37,10 @@ urllib3==2.2.1
 websockets==12.0
 yarl==1.9.4
 oandapyV20
+<<<<<<< HEAD
 logging
 statsmodels
 arch
+=======
+statsmodels
+>>>>>>> 3b723575fb8b33d2199d801686a66f7e56b123ce

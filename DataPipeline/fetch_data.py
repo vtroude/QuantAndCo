@@ -38,7 +38,7 @@ def get_client(market: str) -> Any:
     
     elif market == "forex":
         # Return OANDA client
-        return oandapyV20.API(access_token=os.getenv("ONDA_API_KEY"))
+        return oandapyV20.API(access_token=os.getenv("OANDA_API_KEY"))
     
     return None
 

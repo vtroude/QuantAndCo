@@ -7,6 +7,7 @@ from datetime   import datetime
 
 from DataPipeline.fetch_data                import get_time_series
 from DataPipeline.technicals_indicators     import TechnicalIndicators
+from DataPipeline.utils import convert_unix_to_datetime
 
 
 """
@@ -95,6 +96,12 @@ def get_and_save_timeseries(
     # make necessary directory to save the data
     make_directory_structure(market, symbol, interval, "OHLC")
 
+
+    if market == 'forex':
+        start_str, end_str = convert_unix_to_datetime(start_time), convert_unix_to_datetime(end_time)
+    else:
+        start_str, end_str = start_time, end_time
+
     # Save OHLC data
     data.to_csv(make_filename(market, symbol, interval, start_time, end_time, "OHLC"))
     print(f"Successfully saved OHLC time series for {symbol}")
@@ -124,8 +131,14 @@ def get_and_save_indicators(
     """ Get OHLC + Volume data from File """
     ###############################################################################################
 
+    if market == 'forex':
+        start_str, end_str = convert_unix_to_datetime(start_time), convert_unix_to_datetime(end_time)
+    else:
+        start_str, end_str = start_time, end_time
+
+
     # Format start and end time from Unix timestamp to Datetime string
-    ohlc        = pd.read_csv(make_filename(market, symbol, interval, start_time, end_time, "OHLC"), index_col=0)
+    ohlc        = pd.read_csv(make_filename(market, symbol, interval, start_str, end_str, "OHLC"), index_col=0)
     ohlc.index  = pd.to_datetime(ohlc.index)
 
     ###############################################################################################
@@ -161,15 +174,23 @@ if __name__ == "__main__":
     #start_time  = end_time - ( chunk * n_per_chunk * 60 )
 
     start_time, end_time    = 1563535876, 1713535876
-
-    symbols      = ['CAD_USD', "AUD_USD"]                  # Symbol over which we gather the data      'BTCUSDT'
-    market      = "forex"                   # Market from which we gather data          'crypto'
-    interval    = ['1d']        # Time interval to make the candlestick
+    start_str, end_str = convert_unix_to_datetime(start_time), convert_unix_to_datetime(end_time)
+    print(start_str)
+    print(end_str)
 
     span        = [10, 30, 50, 100, 200, 500, 1000, 2000, 5000, 10_000, 15_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 100, 500]    # Different windows over which we compute statistics
+
+    symbols      = ["EUR_USD", "GBP_USD", "EUR_CHF", "USD_CHF", "AUD_USD"]                # Symbol over which we gather the data      'BTCUSDT'
+    market      = "forex"                   # Market from which we gather data          'crypto'
+    interval    = ['5m', '1h', '1d']        # Time interval to make the candlestick
+
+    span        = [10, 30, 90, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
+    stat_span   = [20, 50, 100]    # Different windows over which we compute statistics
     
     for symbol in symbols:
         for i in interval:
             get_and_save_timeseries(symbol, market, start_time, end_time, i, chunk, n_jobs=10)
-            #get_and_save_indicators(symbol, market, start_time, end_time, i, span=span, stat_span=stat_span, n_jobs=10)
+            print(f"Successfully downloaded and save OHLC data for {symbol} at {i} interval")
+            get_and_save_indicators(symbol, market, start_time, end_time, i, span=span, stat_span=stat_span, n_jobs=10)
+            print(f"Successfully downloaded and save TI data for {symbol} at {i} interval")
