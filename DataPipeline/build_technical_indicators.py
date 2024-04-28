@@ -15,7 +15,7 @@ if __name__ == '__main__':
     data.set_index('timestamp', inplace=True)
     # Get rolling technical indicators e.g. RSI, TSI, Money FLow, etc...
     # And Statistics e.g. volatility, mean return, kurtosis, etc...
-    span        = [20, 100, 200, 500, 1000, 2000, 5000, 10_000]      # Different windows over which we compute the technical indicators
+    span        = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10_000, 12_500, 15_000, 20_000, 30_000, 45_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20] 
 
     ta, ta_last = TechnicalIndicators().get(data, span=span, stat_span=stat_span)

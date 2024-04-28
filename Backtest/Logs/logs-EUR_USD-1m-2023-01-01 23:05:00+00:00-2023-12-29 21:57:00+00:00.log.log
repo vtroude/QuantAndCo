@@ -1,0 +1,794 @@
+2024-04-23 11:59:42,281 - DEBUG - Initializing data checks...
+2024-04-23 11:59:42,293 - DEBUG - Data checks completed.
+2024-04-23 11:59:42,303 - DEBUG - Initializing backtesting...
+2024-04-23 11:59:44,726 - DEBUG - ==================================================
+2024-04-23 11:59:44,727 - DEBUG - NEW Long signal detected on 2023-01-03 07:50:00+00:00
+2024-04-23 11:59:44,727 - DEBUG - Long Trade entered on 2023-01-03 07:51:00+00:00 at entry price: 1.06235
+2024-04-23 11:59:49,881 - DEBUG - CLOSING Long position on 2023-01-05 15:57:00+00:00
+2024-04-23 11:59:49,882 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 11:59:49,882 - DEBUG - Trade exited at exit price: 1.05156
+2024-04-23 11:59:49,882 - DEBUG - Return of trade with leverage 5: -0.0507800851884968
+2024-04-23 11:59:49,882 - DEBUG - ==================================================
+2024-04-23 11:59:49,882 - DEBUG - 
+
+2024-04-23 11:59:52,766 - DEBUG - ==================================================
+2024-04-23 11:59:52,767 - DEBUG - NEW Short signal detected on 2023-01-09 00:00:00+00:00
+2024-04-23 11:59:52,767 - DEBUG - Short Trade entered on 2023-01-09 00:01:00+00:00 at entry price: 1.06659
+2024-04-23 11:59:58,723 - DEBUG - CLOSING Short position on 2023-01-11 15:02:00+00:00
+2024-04-23 11:59:58,723 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 11:59:58,724 - DEBUG - Trade exited at exit price: 1.07734
+2024-04-23 11:59:58,724 - DEBUG - Return of trade with leverage 5: -0.05039071948921325
+2024-04-23 11:59:58,724 - DEBUG - ==================================================
+2024-04-23 11:59:58,724 - DEBUG - 
+
+2024-04-23 12:00:08,096 - DEBUG - ==================================================
+2024-04-23 12:00:08,096 - DEBUG - NEW Long signal detected on 2023-01-17 17:52:00+00:00
+2024-04-23 12:00:08,097 - DEBUG - Long Trade entered on 2023-01-17 17:53:00+00:00 at entry price: 1.07763
+2024-04-23 12:00:15,507 - DEBUG - CLOSING Long position on 2023-01-23 00:53:00+00:00
+2024-04-23 12:00:15,508 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:00:15,508 - DEBUG - Trade exited at exit price: 1.08855
+2024-04-23 12:00:15,508 - DEBUG - Return of trade with leverage 5: 0.050663194231785495
+2024-04-23 12:00:15,508 - DEBUG - ==================================================
+2024-04-23 12:00:15,508 - DEBUG - 
+
+2024-04-23 12:00:23,633 - DEBUG - ==================================================
+2024-04-23 12:00:23,638 - DEBUG - NEW Long signal detected on 2023-01-26 15:52:00+00:00
+2024-04-23 12:00:23,638 - DEBUG - Long Trade entered on 2023-01-26 15:53:00+00:00 at entry price: 1.08607
+2024-04-23 12:00:32,689 - DEBUG - CLOSING Long position on 2023-02-01 15:58:00+00:00
+2024-04-23 12:00:32,689 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:00:32,690 - DEBUG - Trade exited at exit price: 1.09218
+2024-04-23 12:00:32,690 - DEBUG - Return of trade with leverage 5: 0.02812697293912788
+2024-04-23 12:00:32,690 - DEBUG - ==================================================
+2024-04-23 12:00:32,690 - DEBUG - 
+
+2024-04-23 12:00:33,109 - DEBUG - ==================================================
+2024-04-23 12:00:33,110 - DEBUG - NEW Short signal detected on 2023-02-01 19:40:00+00:00
+2024-04-23 12:00:33,110 - DEBUG - Short Trade entered on 2023-02-01 19:41:00+00:00 at entry price: 1.0957
+2024-04-23 12:00:37,279 - DEBUG - CLOSING Short position on 2023-02-03 13:44:00+00:00
+2024-04-23 12:00:37,280 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:00:37,280 - DEBUG - Trade exited at exit price: 1.08436
+2024-04-23 12:00:37,281 - DEBUG - Return of trade with leverage 5: 0.051744118828145995
+2024-04-23 12:00:37,281 - DEBUG - ==================================================
+2024-04-23 12:00:37,281 - DEBUG - 
+
+2024-04-23 12:00:39,651 - DEBUG - ==================================================
+2024-04-23 12:00:39,652 - DEBUG - NEW Long signal detected on 2023-02-06 15:21:00+00:00
+2024-04-23 12:00:39,652 - DEBUG - Long Trade entered on 2023-02-06 15:22:00+00:00 at entry price: 1.07322
+2024-04-23 12:00:53,476 - DEBUG - CLOSING Long position on 2023-02-14 13:33:00+00:00
+2024-04-23 12:00:53,476 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:00:53,477 - DEBUG - Trade exited at exit price: 1.07926
+2024-04-23 12:00:53,477 - DEBUG - Return of trade with leverage 5: 0.028137647453457603
+2024-04-23 12:00:53,477 - DEBUG - ==================================================
+2024-04-23 12:00:53,477 - DEBUG - 
+
+2024-04-23 12:00:53,479 - DEBUG - ==================================================
+2024-04-23 12:00:53,479 - DEBUG - NEW Short signal detected on 2023-02-14 13:33:00+00:00
+2024-04-23 12:00:53,479 - DEBUG - Short Trade entered on 2023-02-14 13:34:00+00:00 at entry price: 1.07873
+2024-04-23 12:00:55,612 - DEBUG - CLOSING Short position on 2023-02-15 13:33:00+00:00
+2024-04-23 12:00:55,612 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:00:55,613 - DEBUG - Trade exited at exit price: 1.06778
+2024-04-23 12:00:55,613 - DEBUG - Return of trade with leverage 5: 0.05075057474993738
+2024-04-23 12:00:55,613 - DEBUG - ==================================================
+2024-04-23 12:00:55,613 - DEBUG - 
+
+2024-04-23 12:01:08,159 - DEBUG - ==================================================
+2024-04-23 12:01:08,160 - DEBUG - NEW Long signal detected on 2023-02-23 09:22:00+00:00
+2024-04-23 12:01:08,160 - DEBUG - Long Trade entered on 2023-02-23 09:23:00+00:00 at entry price: 1.05906
+2024-04-23 12:01:13,179 - DEBUG - CLOSING Long position on 2023-02-27 15:20:00+00:00
+2024-04-23 12:01:13,180 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:01:13,180 - DEBUG - Trade exited at exit price: 1.0613
+2024-04-23 12:01:13,180 - DEBUG - Return of trade with leverage 5: 0.010574675655770426
+2024-04-23 12:01:13,181 - DEBUG - ==================================================
+2024-04-23 12:01:13,181 - DEBUG - 
+
+2024-04-23 12:01:13,184 - DEBUG - ==================================================
+2024-04-23 12:01:13,184 - DEBUG - NEW Short signal detected on 2023-02-27 15:21:00+00:00
+2024-04-23 12:01:13,184 - DEBUG - Short Trade entered on 2023-02-27 15:22:00+00:00 at entry price: 1.0612
+2024-04-23 12:01:36,046 - DEBUG - CLOSING Short position on 2023-03-13 02:54:00+00:00
+2024-04-23 12:01:36,046 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:01:36,047 - DEBUG - Trade exited at exit price: 1.07194
+2024-04-23 12:01:36,047 - DEBUG - Return of trade with leverage 5: -0.05059954862419863
+2024-04-23 12:01:36,047 - DEBUG - ==================================================
+2024-04-23 12:01:36,047 - DEBUG - 
+
+2024-04-23 12:01:49,906 - DEBUG - ==================================================
+2024-04-23 12:01:49,908 - DEBUG - NEW Short signal detected on 2023-03-21 11:22:00+00:00
+2024-04-23 12:01:49,908 - DEBUG - Short Trade entered on 2023-03-21 11:23:00+00:00 at entry price: 1.07732
+2024-04-23 12:01:53,015 - DEBUG - CLOSING Short position on 2023-03-22 18:42:00+00:00
+2024-04-23 12:01:53,015 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:01:53,016 - DEBUG - Trade exited at exit price: 1.08852
+2024-04-23 12:01:53,016 - DEBUG - Return of trade with leverage 5: -0.05197720268815143
+2024-04-23 12:01:53,017 - DEBUG - ==================================================
+2024-04-23 12:01:53,017 - DEBUG - 
+
+2024-04-23 12:02:08,453 - DEBUG - ==================================================
+2024-04-23 12:02:08,455 - DEBUG - NEW Long signal detected on 2023-04-02 22:34:00+00:00
+2024-04-23 12:02:08,455 - DEBUG - Long Trade entered on 2023-04-02 22:35:00+00:00 at entry price: 1.08152
+2024-04-23 12:02:11,590 - DEBUG - CLOSING Long position on 2023-04-04 07:52:00+00:00
+2024-04-23 12:02:11,591 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:02:11,593 - DEBUG - Trade exited at exit price: 1.09374
+2024-04-23 12:02:11,593 - DEBUG - Return of trade with leverage 5: 0.05649060858791319
+2024-04-23 12:02:11,593 - DEBUG - ==================================================
+2024-04-23 12:02:11,593 - DEBUG - 
+
+2024-04-23 12:02:12,164 - DEBUG - ==================================================
+2024-04-23 12:02:12,165 - DEBUG - NEW Short signal detected on 2023-04-04 14:33:00+00:00
+2024-04-23 12:02:12,165 - DEBUG - Short Trade entered on 2023-04-04 14:34:00+00:00 at entry price: 1.09622
+2024-04-23 12:02:20,758 - DEBUG - CLOSING Short position on 2023-04-10 12:09:00+00:00
+2024-04-23 12:02:20,759 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:02:20,760 - DEBUG - Trade exited at exit price: 1.08712
+2024-04-23 12:02:20,760 - DEBUG - Return of trade with leverage 5: 0.0415033615515129
+2024-04-23 12:02:20,760 - DEBUG - ==================================================
+2024-04-23 12:02:20,760 - DEBUG - 
+
+2024-04-23 12:02:20,767 - DEBUG - ==================================================
+2024-04-23 12:02:20,768 - DEBUG - NEW Long signal detected on 2023-04-10 12:11:00+00:00
+2024-04-23 12:02:20,768 - DEBUG - Long Trade entered on 2023-04-10 12:12:00+00:00 at entry price: 1.08668
+2024-04-23 12:02:25,552 - DEBUG - CLOSING Long position on 2023-04-12 12:33:00+00:00
+2024-04-23 12:02:25,552 - DEBUG - Reason: ['Take Profit Rule', 'Change of Signal']
+2024-04-23 12:02:25,553 - DEBUG - Trade exited at exit price: 1.09826
+2024-04-23 12:02:25,553 - DEBUG - Return of trade with leverage 5: 0.05327782511870989
+2024-04-23 12:02:25,553 - DEBUG - ==================================================
+2024-04-23 12:02:25,553 - DEBUG - 
+
+2024-04-23 12:02:25,555 - DEBUG - ==================================================
+2024-04-23 12:02:25,556 - DEBUG - NEW Short signal detected on 2023-04-12 12:33:00+00:00
+2024-04-23 12:02:25,556 - DEBUG - Short Trade entered on 2023-04-12 12:34:00+00:00 at entry price: 1.09804
+2024-04-23 12:02:32,674 - DEBUG - CLOSING Short position on 2023-04-17 14:14:00+00:00
+2024-04-23 12:02:32,674 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:02:32,675 - DEBUG - Trade exited at exit price: 1.09222
+2024-04-23 12:02:32,675 - DEBUG - Return of trade with leverage 5: 0.026499911660777017
+2024-04-23 12:02:32,675 - DEBUG - ==================================================
+2024-04-23 12:02:32,675 - DEBUG - 
+
+2024-04-23 12:02:32,709 - DEBUG - ==================================================
+2024-04-23 12:02:32,710 - DEBUG - NEW Long signal detected on 2023-04-17 14:39:00+00:00
+2024-04-23 12:02:32,710 - DEBUG - Long Trade entered on 2023-04-17 14:40:00+00:00 at entry price: 1.09132
+2024-04-23 12:02:43,674 - DEBUG - CLOSING Long position on 2023-04-24 13:00:00+00:00
+2024-04-23 12:02:43,675 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:02:43,676 - DEBUG - Trade exited at exit price: 1.10214
+2024-04-23 12:02:43,676 - DEBUG - Return of trade with leverage 5: 0.04956952406260246
+2024-04-23 12:02:43,676 - DEBUG - ==================================================
+2024-04-23 12:02:43,676 - DEBUG - 
+
+2024-04-23 12:02:55,492 - DEBUG - ==================================================
+2024-04-23 12:02:55,494 - DEBUG - NEW Long signal detected on 2023-05-01 14:45:00+00:00
+2024-04-23 12:02:55,494 - DEBUG - Long Trade entered on 2023-05-01 14:46:00+00:00 at entry price: 1.098
+2024-04-23 12:03:00,602 - DEBUG - CLOSING Long position on 2023-05-03 18:03:00+00:00
+2024-04-23 12:03:00,602 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:03:00,604 - DEBUG - Trade exited at exit price: 1.10752
+2024-04-23 12:03:00,604 - DEBUG - Return of trade with leverage 5: 0.043348513661202334
+2024-04-23 12:03:00,604 - DEBUG - ==================================================
+2024-04-23 12:03:00,604 - DEBUG - 
+
+2024-04-23 12:03:08,844 - DEBUG - ==================================================
+2024-04-23 12:03:08,846 - DEBUG - NEW Long signal detected on 2023-05-09 12:58:00+00:00
+2024-04-23 12:03:08,846 - DEBUG - Long Trade entered on 2023-05-09 12:59:00+00:00 at entry price: 1.09501
+2024-04-23 12:03:22,153 - DEBUG - CLOSING Long position on 2023-05-17 07:39:00+00:00
+2024-04-23 12:03:22,153 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:03:22,154 - DEBUG - Trade exited at exit price: 1.08428
+2024-04-23 12:03:22,155 - DEBUG - Return of trade with leverage 5: -0.04899155669811296
+2024-04-23 12:03:22,155 - DEBUG - ==================================================
+2024-04-23 12:03:22,155 - DEBUG - 
+
+2024-04-23 12:03:24,597 - DEBUG - ==================================================
+2024-04-23 12:03:24,598 - DEBUG - NEW Long signal detected on 2023-05-18 12:49:00+00:00
+2024-04-23 12:03:24,599 - DEBUG - Long Trade entered on 2023-05-18 12:50:00+00:00 at entry price: 1.07858
+2024-04-23 12:03:34,119 - DEBUG - CLOSING Long position on 2023-05-24 12:23:00+00:00
+2024-04-23 12:03:34,120 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:03:34,121 - DEBUG - Trade exited at exit price: 1.07979
+2024-04-23 12:03:34,121 - DEBUG - Return of trade with leverage 5: 0.0056088343006539445
+2024-04-23 12:03:34,121 - DEBUG - ==================================================
+2024-04-23 12:03:34,121 - DEBUG - 
+
+2024-04-23 12:03:34,123 - DEBUG - ==================================================
+2024-04-23 12:03:34,124 - DEBUG - NEW Short signal detected on 2023-05-24 12:23:00+00:00
+2024-04-23 12:03:34,124 - DEBUG - Short Trade entered on 2023-05-24 12:24:00+00:00 at entry price: 1.07942
+2024-04-23 12:03:42,622 - DEBUG - CLOSING Short position on 2023-05-30 05:46:00+00:00
+2024-04-23 12:03:42,622 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:03:42,623 - DEBUG - Trade exited at exit price: 1.06846
+2024-04-23 12:03:42,623 - DEBUG - Return of trade with leverage 5: 0.05076445127939132
+2024-04-23 12:03:42,623 - DEBUG - ==================================================
+2024-04-23 12:03:42,623 - DEBUG - 
+
+2024-04-23 12:03:42,989 - DEBUG - ==================================================
+2024-04-23 12:03:42,990 - DEBUG - NEW Short signal detected on 2023-05-30 10:02:00+00:00
+2024-04-23 12:03:42,990 - DEBUG - Short Trade entered on 2023-05-30 10:03:00+00:00 at entry price: 1.07314
+2024-04-23 12:04:07,072 - DEBUG - CLOSING Short position on 2023-06-14 13:18:00+00:00
+2024-04-23 12:04:07,072 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:04:07,074 - DEBUG - Trade exited at exit price: 1.08386
+2024-04-23 12:04:07,074 - DEBUG - Return of trade with leverage 5: -0.04994338856067313
+2024-04-23 12:04:07,074 - DEBUG - ==================================================
+2024-04-23 12:04:07,074 - DEBUG - 
+
+2024-04-23 12:04:07,076 - DEBUG - ==================================================
+2024-04-23 12:04:07,076 - DEBUG - NEW Short signal detected on 2023-06-14 13:18:00+00:00
+2024-04-23 12:04:07,076 - DEBUG - Short Trade entered on 2023-06-14 13:19:00+00:00 at entry price: 1.08378
+2024-04-23 12:04:09,647 - DEBUG - CLOSING Short position on 2023-06-15 17:45:00+00:00
+2024-04-23 12:04:09,647 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:04:09,648 - DEBUG - Trade exited at exit price: 1.09466
+2024-04-23 12:04:09,648 - DEBUG - Return of trade with leverage 5: -0.05019117533078722
+2024-04-23 12:04:09,648 - DEBUG - ==================================================
+2024-04-23 12:04:09,648 - DEBUG - 
+
+2024-04-23 12:04:21,793 - DEBUG - ==================================================
+2024-04-23 12:04:21,795 - DEBUG - NEW Long signal detected on 2023-06-23 02:04:00+00:00
+2024-04-23 12:04:21,795 - DEBUG - Long Trade entered on 2023-06-23 02:05:00+00:00 at entry price: 1.09386
+2024-04-23 12:04:45,025 - DEBUG - CLOSING Long position on 2023-07-07 12:35:00+00:00
+2024-04-23 12:04:45,025 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:04:45,027 - DEBUG - Trade exited at exit price: 1.09248
+2024-04-23 12:04:45,027 - DEBUG - Return of trade with leverage 5: -0.006307495474741597
+2024-04-23 12:04:45,027 - DEBUG - ==================================================
+2024-04-23 12:04:45,027 - DEBUG - 
+
+2024-04-23 12:04:45,030 - DEBUG - ==================================================
+2024-04-23 12:04:45,030 - DEBUG - NEW Short signal detected on 2023-07-07 12:35:00+00:00
+2024-04-23 12:04:45,030 - DEBUG - Short Trade entered on 2023-07-07 12:36:00+00:00 at entry price: 1.09302
+2024-04-23 12:04:51,728 - DEBUG - CLOSING Short position on 2023-07-12 12:31:00+00:00
+2024-04-23 12:04:51,728 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:04:51,730 - DEBUG - Trade exited at exit price: 1.10592
+2024-04-23 12:04:51,730 - DEBUG - Return of trade with leverage 5: -0.05900668331777948
+2024-04-23 12:04:51,730 - DEBUG - ==================================================
+2024-04-23 12:04:51,730 - DEBUG - 
+
+2024-04-23 12:04:51,734 - DEBUG - ==================================================
+2024-04-23 12:04:51,735 - DEBUG - NEW Short signal detected on 2023-07-12 12:32:00+00:00
+2024-04-23 12:04:51,735 - DEBUG - Short Trade entered on 2023-07-12 12:33:00+00:00 at entry price: 1.10573
+2024-04-23 12:04:53,437 - DEBUG - CLOSING Short position on 2023-07-13 08:44:00+00:00
+2024-04-23 12:04:53,438 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:04:53,439 - DEBUG - Trade exited at exit price: 1.1169
+2024-04-23 12:04:53,439 - DEBUG - Return of trade with leverage 5: -0.05050608240709763
+2024-04-23 12:04:53,439 - DEBUG - ==================================================
+2024-04-23 12:04:53,439 - DEBUG - 
+
+2024-04-23 12:04:54,372 - DEBUG - ==================================================
+2024-04-23 12:04:54,373 - DEBUG - NEW Short signal detected on 2023-07-13 19:22:00+00:00
+2024-04-23 12:04:54,373 - DEBUG - Short Trade entered on 2023-07-13 19:23:00+00:00 at entry price: 1.12242
+2024-04-23 12:05:02,539 - DEBUG - CLOSING Short position on 2023-07-19 06:41:00+00:00
+2024-04-23 12:05:02,539 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:05:02,540 - DEBUG - Trade exited at exit price: 1.12059
+2024-04-23 12:05:02,540 - DEBUG - Return of trade with leverage 5: 0.00815145801037052
+2024-04-23 12:05:02,540 - DEBUG - ==================================================
+2024-04-23 12:05:02,540 - DEBUG - 
+
+2024-04-23 12:05:02,542 - DEBUG - ==================================================
+2024-04-23 12:05:02,542 - DEBUG - NEW Long signal detected on 2023-07-19 06:41:00+00:00
+2024-04-23 12:05:02,542 - DEBUG - Long Trade entered on 2023-07-19 06:42:00+00:00 at entry price: 1.1204
+2024-04-23 12:05:09,050 - DEBUG - CLOSING Long position on 2023-07-24 07:32:00+00:00
+2024-04-23 12:05:09,050 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:05:09,052 - DEBUG - Trade exited at exit price: 1.10901
+2024-04-23 12:05:09,052 - DEBUG - Return of trade with leverage 5: -0.05082650258836138
+2024-04-23 12:05:09,052 - DEBUG - ==================================================
+2024-04-23 12:05:09,052 - DEBUG - 
+
+2024-04-23 12:05:09,053 - DEBUG - ==================================================
+2024-04-23 12:05:09,054 - DEBUG - NEW Long signal detected on 2023-07-24 07:32:00+00:00
+2024-04-23 12:05:09,054 - DEBUG - Long Trade entered on 2023-07-24 07:33:00+00:00 at entry price: 1.10922
+2024-04-23 12:05:16,901 - DEBUG - CLOSING Long position on 2023-07-27 18:30:00+00:00
+2024-04-23 12:05:16,902 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:05:16,903 - DEBUG - Trade exited at exit price: 1.098
+2024-04-23 12:05:16,903 - DEBUG - Return of trade with leverage 5: -0.05057254016335786
+2024-04-23 12:05:16,903 - DEBUG - ==================================================
+2024-04-23 12:05:16,903 - DEBUG - 
+
+2024-04-23 12:05:37,495 - DEBUG - ==================================================
+2024-04-23 12:05:37,497 - DEBUG - NEW Short signal detected on 2023-08-10 07:15:00+00:00
+2024-04-23 12:05:37,497 - DEBUG - Short Trade entered on 2023-08-10 07:16:00+00:00 at entry price: 1.1016
+2024-04-23 12:05:42,422 - DEBUG - CLOSING Short position on 2023-08-14 12:44:00+00:00
+2024-04-23 12:05:42,422 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:05:42,423 - DEBUG - Trade exited at exit price: 1.09038
+2024-04-23 12:05:42,423 - DEBUG - Return of trade with leverage 5: 0.05092236111111111
+2024-04-23 12:05:42,423 - DEBUG - ==================================================
+2024-04-23 12:05:42,423 - DEBUG - 
+
+2024-04-23 12:05:42,425 - DEBUG - ==================================================
+2024-04-23 12:05:42,426 - DEBUG - NEW Long signal detected on 2023-08-14 12:44:00+00:00
+2024-04-23 12:05:42,426 - DEBUG - Long Trade entered on 2023-08-14 12:45:00+00:00 at entry price: 1.09064
+2024-04-23 12:05:54,811 - DEBUG - CLOSING Long position on 2023-08-22 07:20:00+00:00
+2024-04-23 12:05:54,811 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:05:54,812 - DEBUG - Trade exited at exit price: 1.0924
+2024-04-23 12:05:54,812 - DEBUG - Return of trade with leverage 5: 0.008068092129391696
+2024-04-23 12:05:54,812 - DEBUG - ==================================================
+2024-04-23 12:05:54,812 - DEBUG - 
+
+2024-04-23 12:05:54,814 - DEBUG - ==================================================
+2024-04-23 12:05:54,814 - DEBUG - NEW Short signal detected on 2023-08-22 07:20:00+00:00
+2024-04-23 12:05:54,814 - DEBUG - Short Trade entered on 2023-08-22 07:21:00+00:00 at entry price: 1.09244
+2024-04-23 12:05:57,001 - DEBUG - CLOSING Short position on 2023-08-23 07:34:00+00:00
+2024-04-23 12:05:57,002 - DEBUG - Reason: ['Take Profit Rule', 'Change of Signal']
+2024-04-23 12:05:57,003 - DEBUG - Trade exited at exit price: 1.08196
+2024-04-23 12:05:57,003 - DEBUG - Return of trade with leverage 5: 0.04796266339570164
+2024-04-23 12:05:57,003 - DEBUG - ==================================================
+2024-04-23 12:05:57,003 - DEBUG - 
+
+2024-04-23 12:05:57,006 - DEBUG - ==================================================
+2024-04-23 12:05:57,007 - DEBUG - NEW Long signal detected on 2023-08-23 07:35:00+00:00
+2024-04-23 12:05:57,007 - DEBUG - Long Trade entered on 2023-08-23 07:36:00+00:00 at entry price: 1.08183
+2024-04-23 12:06:07,173 - DEBUG - CLOSING Long position on 2023-08-29 17:02:00+00:00
+2024-04-23 12:06:07,173 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:06:07,174 - DEBUG - Trade exited at exit price: 1.08669
+2024-04-23 12:06:07,175 - DEBUG - Return of trade with leverage 5: 0.02246036715565277
+2024-04-23 12:06:07,175 - DEBUG - ==================================================
+2024-04-23 12:06:07,175 - DEBUG - 
+
+2024-04-23 12:06:07,176 - DEBUG - ==================================================
+2024-04-23 12:06:07,177 - DEBUG - NEW Short signal detected on 2023-08-29 17:02:00+00:00
+2024-04-23 12:06:07,177 - DEBUG - Short Trade entered on 2023-08-29 17:03:00+00:00 at entry price: 1.08686
+2024-04-23 12:06:17,053 - DEBUG - CLOSING Short position on 2023-09-05 06:36:00+00:00
+2024-04-23 12:06:17,053 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:06:17,054 - DEBUG - Trade exited at exit price: 1.07614
+2024-04-23 12:06:17,055 - DEBUG - Return of trade with leverage 5: 0.049312927147930015
+2024-04-23 12:06:17,055 - DEBUG - ==================================================
+2024-04-23 12:06:17,055 - DEBUG - 
+
+2024-04-23 12:06:27,227 - DEBUG - ==================================================
+2024-04-23 12:06:27,228 - DEBUG - NEW Short signal detected on 2023-09-12 01:12:00+00:00
+2024-04-23 12:06:27,228 - DEBUG - Short Trade entered on 2023-09-12 01:13:00+00:00 at entry price: 1.07568
+2024-04-23 12:06:32,971 - DEBUG - CLOSING Short position on 2023-09-14 16:25:00+00:00
+2024-04-23 12:06:32,971 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:06:32,972 - DEBUG - Trade exited at exit price: 1.06479
+2024-04-23 12:06:32,973 - DEBUG - Return of trade with leverage 5: 0.05061559989959847
+2024-04-23 12:06:32,973 - DEBUG - ==================================================
+2024-04-23 12:06:32,973 - DEBUG - 
+
+2024-04-23 12:06:38,663 - DEBUG - ==================================================
+2024-04-23 12:06:38,664 - DEBUG - NEW Short signal detected on 2023-09-19 10:40:00+00:00
+2024-04-23 12:06:38,664 - DEBUG - Short Trade entered on 2023-09-19 10:41:00+00:00 at entry price: 1.07086
+2024-04-23 12:06:47,991 - DEBUG - CLOSING Short position on 2023-09-25 13:42:00+00:00
+2024-04-23 12:06:47,992 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:06:47,993 - DEBUG - Trade exited at exit price: 1.05996
+2024-04-23 12:06:47,993 - DEBUG - Return of trade with leverage 5: 0.05089011168593449
+2024-04-23 12:06:47,993 - DEBUG - ==================================================
+2024-04-23 12:06:47,993 - DEBUG - 
+
+2024-04-23 12:06:48,056 - DEBUG - ==================================================
+2024-04-23 12:06:48,056 - DEBUG - NEW Long signal detected on 2023-09-25 14:25:00+00:00
+2024-04-23 12:06:48,057 - DEBUG - Long Trade entered on 2023-09-25 14:26:00+00:00 at entry price: 1.05805
+2024-04-23 12:07:00,267 - DEBUG - CLOSING Long position on 2023-10-03 00:10:00+00:00
+2024-04-23 12:07:00,268 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:07:00,269 - DEBUG - Trade exited at exit price: 1.04666
+2024-04-23 12:07:00,269 - DEBUG - Return of trade with leverage 5: -0.053821665800293086
+2024-04-23 12:07:00,269 - DEBUG - ==================================================
+2024-04-23 12:07:00,269 - DEBUG - 
+
+2024-04-23 12:07:06,662 - DEBUG - ==================================================
+2024-04-23 12:07:06,664 - DEBUG - NEW Short signal detected on 2023-10-05 18:59:00+00:00
+2024-04-23 12:07:06,664 - DEBUG - Short Trade entered on 2023-10-05 19:00:00+00:00 at entry price: 1.05504
+2024-04-23 12:07:32,990 - DEBUG - CLOSING Short position on 2023-10-23 16:52:00+00:00
+2024-04-23 12:07:32,990 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:07:32,991 - DEBUG - Trade exited at exit price: 1.06574
+2024-04-23 12:07:32,992 - DEBUG - Return of trade with leverage 5: -0.0507054282302088
+2024-04-23 12:07:32,992 - DEBUG - ==================================================
+2024-04-23 12:07:32,992 - DEBUG - 
+
+2024-04-23 12:07:32,997 - DEBUG - ==================================================
+2024-04-23 12:07:32,997 - DEBUG - NEW Short signal detected on 2023-10-23 16:54:00+00:00
+2024-04-23 12:07:32,997 - DEBUG - Short Trade entered on 2023-10-23 16:55:00+00:00 at entry price: 1.06611
+2024-04-23 12:07:36,562 - DEBUG - CLOSING Short position on 2023-10-25 09:27:00+00:00
+2024-04-23 12:07:36,562 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:07:36,563 - DEBUG - Trade exited at exit price: 1.05673
+2024-04-23 12:07:36,563 - DEBUG - Return of trade with leverage 5: 0.043988628753130504
+2024-04-23 12:07:36,563 - DEBUG - ==================================================
+2024-04-23 12:07:36,563 - DEBUG - 
+
+2024-04-23 12:07:36,566 - DEBUG - ==================================================
+2024-04-23 12:07:36,566 - DEBUG - NEW Long signal detected on 2023-10-25 09:27:00+00:00
+2024-04-23 12:07:36,566 - DEBUG - Long Trade entered on 2023-10-25 09:28:00+00:00 at entry price: 1.05677
+2024-04-23 12:07:45,480 - DEBUG - CLOSING Long position on 2023-10-31 09:59:00+00:00
+2024-04-23 12:07:45,481 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:07:45,482 - DEBUG - Trade exited at exit price: 1.06684
+2024-04-23 12:07:45,482 - DEBUG - Return of trade with leverage 5: 0.047641847800373345
+2024-04-23 12:07:45,482 - DEBUG - ==================================================
+2024-04-23 12:07:45,482 - DEBUG - 
+
+2024-04-23 12:07:45,484 - DEBUG - ==================================================
+2024-04-23 12:07:45,484 - DEBUG - NEW Short signal detected on 2023-10-31 09:59:00+00:00
+2024-04-23 12:07:45,484 - DEBUG - Short Trade entered on 2023-10-31 10:00:00+00:00 at entry price: 1.06614
+2024-04-23 12:07:47,661 - DEBUG - CLOSING Short position on 2023-11-01 09:27:00+00:00
+2024-04-23 12:07:47,661 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:07:47,662 - DEBUG - Trade exited at exit price: 1.05522
+2024-04-23 12:07:47,662 - DEBUG - Return of trade with leverage 5: 0.05120920141820029
+2024-04-23 12:07:47,662 - DEBUG - ==================================================
+2024-04-23 12:07:47,662 - DEBUG - 
+
+2024-04-23 12:07:48,020 - DEBUG - ==================================================
+2024-04-23 12:07:48,021 - DEBUG - NEW Long signal detected on 2023-11-01 13:18:00+00:00
+2024-04-23 12:07:48,022 - DEBUG - Long Trade entered on 2023-11-01 13:19:00+00:00 at entry price: 1.05292
+2024-04-23 12:07:50,000 - DEBUG - CLOSING Long position on 2023-11-02 10:58:00+00:00
+2024-04-23 12:07:50,000 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:07:50,001 - DEBUG - Trade exited at exit price: 1.06351
+2024-04-23 12:07:50,001 - DEBUG - Return of trade with leverage 5: 0.05028520068001331
+2024-04-23 12:07:50,001 - DEBUG - ==================================================
+2024-04-23 12:07:50,002 - DEBUG - 
+
+2024-04-23 12:07:50,165 - DEBUG - ==================================================
+2024-04-23 12:07:50,165 - DEBUG - NEW Short signal detected on 2023-11-02 12:48:00+00:00
+2024-04-23 12:07:50,165 - DEBUG - Short Trade entered on 2023-11-02 12:49:00+00:00 at entry price: 1.06624
+2024-04-23 12:08:06,990 - DEBUG - CLOSING Short position on 2023-11-14 13:31:00+00:00
+2024-04-23 12:08:06,991 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:08:06,992 - DEBUG - Trade exited at exit price: 1.07716
+2024-04-23 12:08:06,992 - DEBUG - Return of trade with leverage 5: -0.051204398634453044
+2024-04-23 12:08:06,992 - DEBUG - ==================================================
+2024-04-23 12:08:06,992 - DEBUG - 
+
+2024-04-23 12:08:07,007 - DEBUG - ==================================================
+2024-04-23 12:08:07,007 - DEBUG - NEW Short signal detected on 2023-11-14 13:42:00+00:00
+2024-04-23 12:08:07,007 - DEBUG - Short Trade entered on 2023-11-14 13:43:00+00:00 at entry price: 1.0794
+2024-04-23 12:08:14,356 - DEBUG - CLOSING Short position on 2023-11-17 18:55:00+00:00
+2024-04-23 12:08:14,356 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:08:14,358 - DEBUG - Trade exited at exit price: 1.0902
+2024-04-23 12:08:14,358 - DEBUG - Return of trade with leverage 5: -0.05002429127293034
+2024-04-23 12:08:14,358 - DEBUG - ==================================================
+2024-04-23 12:08:14,358 - DEBUG - 
+
+2024-04-23 12:08:20,394 - DEBUG - ==================================================
+2024-04-23 12:08:20,395 - DEBUG - NEW Long signal detected on 2023-11-22 15:00:00+00:00
+2024-04-23 12:08:20,395 - DEBUG - Long Trade entered on 2023-11-22 15:01:00+00:00 at entry price: 1.0861
+2024-04-23 12:08:29,333 - DEBUG - CLOSING Long position on 2023-11-28 13:58:00+00:00
+2024-04-23 12:08:29,333 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-23 12:08:29,334 - DEBUG - Trade exited at exit price: 1.09724
+2024-04-23 12:08:29,334 - DEBUG - Return of trade with leverage 5: 0.05128082220789955
+2024-04-23 12:08:29,334 - DEBUG - ==================================================
+2024-04-23 12:08:29,335 - DEBUG - 
+
+2024-04-23 12:08:33,021 - DEBUG - ==================================================
+2024-04-23 12:08:33,022 - DEBUG - NEW Long signal detected on 2023-11-30 08:39:00+00:00
+2024-04-23 12:08:33,023 - DEBUG - Long Trade entered on 2023-11-30 08:40:00+00:00 at entry price: 1.09246
+2024-04-23 12:08:38,218 - DEBUG - CLOSING Long position on 2023-12-04 15:26:00+00:00
+2024-04-23 12:08:38,219 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:08:38,220 - DEBUG - Trade exited at exit price: 1.08135
+2024-04-23 12:08:38,220 - DEBUG - Return of trade with leverage 5: -0.05084498425571624
+2024-04-23 12:08:38,220 - DEBUG - ==================================================
+2024-04-23 12:08:38,220 - DEBUG - 
+
+2024-04-23 12:08:46,504 - DEBUG - ==================================================
+2024-04-23 12:08:46,506 - DEBUG - NEW Long signal detected on 2023-12-08 13:30:00+00:00
+2024-04-23 12:08:46,506 - DEBUG - Long Trade entered on 2023-12-08 13:31:00+00:00 at entry price: 1.07401
+2024-04-23 12:08:50,448 - DEBUG - CLOSING Long position on 2023-12-12 06:59:00+00:00
+2024-04-23 12:08:50,449 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:08:50,450 - DEBUG - Trade exited at exit price: 1.07795
+2024-04-23 12:08:50,450 - DEBUG - Return of trade with leverage 5: 0.01834118956061936
+2024-04-23 12:08:50,450 - DEBUG - ==================================================
+2024-04-23 12:08:50,450 - DEBUG - 
+
+2024-04-23 12:08:50,452 - DEBUG - ==================================================
+2024-04-23 12:08:50,453 - DEBUG - NEW Short signal detected on 2023-12-12 06:59:00+00:00
+2024-04-23 12:08:50,453 - DEBUG - Short Trade entered on 2023-12-12 07:00:00+00:00 at entry price: 1.07777
+2024-04-23 12:08:53,985 - DEBUG - CLOSING Short position on 2023-12-13 19:43:00+00:00
+2024-04-23 12:08:53,985 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:08:53,986 - DEBUG - Trade exited at exit price: 1.08819
+2024-04-23 12:08:53,987 - DEBUG - Return of trade with leverage 5: -0.04833717119608117
+2024-04-23 12:08:53,987 - DEBUG - ==================================================
+2024-04-23 12:08:53,987 - DEBUG - 
+
+2024-04-23 12:08:55,639 - DEBUG - ==================================================
+2024-04-23 12:08:55,640 - DEBUG - NEW Short signal detected on 2023-12-14 14:13:00+00:00
+2024-04-23 12:08:55,640 - DEBUG - Short Trade entered on 2023-12-14 14:14:00+00:00 at entry price: 1.09668
+2024-04-23 12:09:13,731 - DEBUG - CLOSING Short position on 2023-12-27 14:21:00+00:00
+2024-04-23 12:09:13,731 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-23 12:09:13,732 - DEBUG - Trade exited at exit price: 1.1081
+2024-04-23 12:09:13,732 - DEBUG - Return of trade with leverage 5: -0.05206259164022273
+2024-04-23 12:09:13,733 - DEBUG - ==================================================
+2024-04-23 12:09:13,733 - DEBUG - 
+
+2024-04-23 12:09:13,735 - DEBUG - ==================================================
+2024-04-23 12:09:13,735 - DEBUG - NEW Short signal detected on 2023-12-27 14:21:00+00:00
+2024-04-23 12:09:13,735 - DEBUG - Short Trade entered on 2023-12-27 14:22:00+00:00 at entry price: 1.10782
+2024-04-23 12:09:17,744 - DEBUG - CLOSING Short position on 2023-12-29 09:35:00+00:00
+2024-04-23 12:09:17,744 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:09:17,745 - DEBUG - Trade exited at exit price: 1.10464
+2024-04-23 12:09:17,745 - DEBUG - Return of trade with leverage 5: 0.014351507465111692
+2024-04-23 12:09:17,745 - DEBUG - ==================================================
+2024-04-23 12:09:17,745 - DEBUG - 
+
+2024-04-23 12:09:17,748 - DEBUG - ==================================================
+2024-04-23 12:09:17,752 - DEBUG - NEW Long signal detected on 2023-12-29 09:35:00+00:00
+2024-04-23 12:09:17,752 - DEBUG - Long Trade entered on 2023-12-29 09:36:00+00:00 at entry price: 1.1048
+2024-04-23 12:09:19,029 - DEBUG - CLOSING Long position on 2023-12-29 21:56:00+00:00
+2024-04-23 12:09:19,029 - DEBUG - Reason: End of backtesting, closing all positions.
+2024-04-23 12:09:19,029 - DEBUG - Trade exited at exit price: 1.10374
+2024-04-23 12:09:19,029 - DEBUG - Return of trade with leverage 5: -0.004796912563359958
+2024-04-23 12:09:19,031 - DEBUG - Final wealth: 1.0560986865649518
+2024-04-23 12:09:19,031 - DEBUG - Backtesting completed.
+2024-04-23 12:15:10,576 - DEBUG - Initializing data checks...
+2024-04-23 12:15:10,584 - DEBUG - Data checks completed.
+2024-04-23 12:15:10,591 - DEBUG - Initializing backtesting...
+2024-04-23 12:15:12,831 - DEBUG - ==================================================
+2024-04-23 12:15:12,831 - DEBUG - NEW Long signal detected on 2023-01-03 07:50:00+00:00
+2024-04-23 12:15:12,831 - DEBUG - Long Trade entered on 2023-01-03 07:51:00+00:00 at entry price: 1.06235
+2024-04-23 12:15:20,863 - DEBUG - CLOSING Long position on 2023-01-09 00:01:00+00:00
+2024-04-23 12:15:20,863 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:15:20,863 - DEBUG - Trade exited at exit price: 1.06659
+2024-04-23 12:15:20,864 - DEBUG - Return of trade with leverage 10: 0.03990872311385262
+2024-04-23 12:15:20,864 - DEBUG - ==================================================
+2024-04-23 12:15:20,864 - DEBUG - 
+
+2024-04-23 12:15:20,865 - DEBUG - ==================================================
+2024-04-23 12:15:20,866 - DEBUG - NEW Short signal detected on 2023-01-09 00:01:00+00:00
+2024-04-23 12:15:20,866 - DEBUG - Short Trade entered on 2023-01-09 00:02:00+00:00 at entry price: 1.06671
+2024-04-23 12:15:35,940 - DEBUG - CLOSING Short position on 2023-01-17 17:53:00+00:00
+2024-04-23 12:15:35,941 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:15:35,941 - DEBUG - Trade exited at exit price: 1.07763
+2024-04-23 12:15:35,941 - DEBUG - Return of trade with leverage 10: -0.10236367522569514
+2024-04-23 12:15:35,941 - DEBUG - ==================================================
+2024-04-23 12:15:35,942 - DEBUG - 
+
+2024-04-23 12:15:35,944 - DEBUG - ==================================================
+2024-04-23 12:15:35,945 - DEBUG - NEW Long signal detected on 2023-01-17 17:54:00+00:00
+2024-04-23 12:15:35,945 - DEBUG - Long Trade entered on 2023-01-17 17:55:00+00:00 at entry price: 1.0776
+2024-04-23 12:16:01,019 - DEBUG - CLOSING Long position on 2023-02-01 15:58:00+00:00
+2024-04-23 12:16:01,020 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:16:01,021 - DEBUG - Trade exited at exit price: 1.09218
+2024-04-23 12:16:01,021 - DEBUG - Return of trade with leverage 10: 0.13529119710467732
+2024-04-23 12:16:01,021 - DEBUG - ==================================================
+2024-04-23 12:16:01,021 - DEBUG - 
+
+2024-04-23 12:16:01,363 - DEBUG - ==================================================
+2024-04-23 12:16:01,363 - DEBUG - NEW Short signal detected on 2023-02-01 19:40:00+00:00
+2024-04-23 12:16:01,363 - DEBUG - Short Trade entered on 2023-02-01 19:41:00+00:00 at entry price: 1.0957
+2024-04-23 12:16:07,606 - DEBUG - CLOSING Short position on 2023-02-06 15:22:00+00:00
+2024-04-23 12:16:07,607 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:16:07,607 - DEBUG - Trade exited at exit price: 1.07322
+2024-04-23 12:16:07,607 - DEBUG - Return of trade with leverage 10: 0.20515128593592968
+2024-04-23 12:16:07,607 - DEBUG - ==================================================
+2024-04-23 12:16:07,608 - DEBUG - 
+
+2024-04-23 12:16:07,609 - DEBUG - ==================================================
+2024-04-23 12:16:07,610 - DEBUG - NEW Long signal detected on 2023-02-06 15:22:00+00:00
+2024-04-23 12:16:07,610 - DEBUG - Long Trade entered on 2023-02-06 15:23:00+00:00 at entry price: 1.07299
+2024-04-23 12:16:20,736 - DEBUG - CLOSING Long position on 2023-02-14 13:33:00+00:00
+2024-04-23 12:16:20,736 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:16:20,737 - DEBUG - Trade exited at exit price: 1.07926
+2024-04-23 12:16:20,737 - DEBUG - Return of trade with leverage 10: 0.05843075051957633
+2024-04-23 12:16:20,737 - DEBUG - ==================================================
+2024-04-23 12:16:20,737 - DEBUG - 
+
+2024-04-23 12:16:20,739 - DEBUG - ==================================================
+2024-04-23 12:16:20,740 - DEBUG - NEW Short signal detected on 2023-02-14 13:33:00+00:00
+2024-04-23 12:16:20,740 - DEBUG - Short Trade entered on 2023-02-14 13:34:00+00:00 at entry price: 1.07873
+2024-04-23 12:16:35,799 - DEBUG - CLOSING Short position on 2023-02-23 09:23:00+00:00
+2024-04-23 12:16:35,799 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:16:35,800 - DEBUG - Trade exited at exit price: 1.05906
+2024-04-23 12:16:35,800 - DEBUG - Return of trade with leverage 10: 0.18233128864498138
+2024-04-23 12:16:35,800 - DEBUG - ==================================================
+2024-04-23 12:16:35,800 - DEBUG - 
+
+2024-04-23 12:16:35,802 - DEBUG - ==================================================
+2024-04-23 12:16:35,802 - DEBUG - NEW Long signal detected on 2023-02-23 09:23:00+00:00
+2024-04-23 12:16:35,802 - DEBUG - Long Trade entered on 2023-02-23 09:24:00+00:00 at entry price: 1.05921
+2024-04-23 12:16:40,866 - DEBUG - CLOSING Long position on 2023-02-27 15:20:00+00:00
+2024-04-23 12:16:40,866 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:16:40,871 - DEBUG - Trade exited at exit price: 1.0613
+2024-04-23 12:16:40,872 - DEBUG - Return of trade with leverage 10: 0.01973030560511908
+2024-04-23 12:16:40,872 - DEBUG - ==================================================
+2024-04-23 12:16:40,872 - DEBUG - 
+
+2024-04-23 12:16:40,875 - DEBUG - ==================================================
+2024-04-23 12:16:40,876 - DEBUG - NEW Short signal detected on 2023-02-27 15:21:00+00:00
+2024-04-23 12:16:40,876 - DEBUG - Short Trade entered on 2023-02-27 15:22:00+00:00 at entry price: 1.0612
+2024-04-23 12:17:37,850 - DEBUG - CLOSING Short position on 2023-04-02 22:35:00+00:00
+2024-04-23 12:17:37,850 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:17:37,851 - DEBUG - Trade exited at exit price: 1.08152
+2024-04-23 12:17:37,851 - DEBUG - Return of trade with leverage 10: -0.19146793818319077
+2024-04-23 12:17:37,851 - DEBUG - ==================================================
+2024-04-23 12:17:37,851 - DEBUG - 
+
+2024-04-23 12:17:41,667 - DEBUG - ==================================================
+2024-04-23 12:17:41,670 - DEBUG - NEW Short signal detected on 2023-04-04 14:33:00+00:00
+2024-04-23 12:17:41,671 - DEBUG - Short Trade entered on 2023-04-04 14:34:00+00:00 at entry price: 1.09622
+2024-04-23 12:17:49,976 - DEBUG - CLOSING Short position on 2023-04-10 12:09:00+00:00
+2024-04-23 12:17:49,976 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:17:49,977 - DEBUG - Trade exited at exit price: 1.08712
+2024-04-23 12:17:49,977 - DEBUG - Return of trade with leverage 10: 0.0830067231030258
+2024-04-23 12:17:49,977 - DEBUG - ==================================================
+2024-04-23 12:17:49,977 - DEBUG - 
+
+2024-04-23 12:17:49,982 - DEBUG - ==================================================
+2024-04-23 12:17:49,983 - DEBUG - NEW Long signal detected on 2023-04-10 12:11:00+00:00
+2024-04-23 12:17:49,983 - DEBUG - Long Trade entered on 2023-04-10 12:12:00+00:00 at entry price: 1.08668
+2024-04-23 12:17:54,353 - DEBUG - CLOSING Long position on 2023-04-12 12:33:00+00:00
+2024-04-23 12:17:54,353 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:17:54,354 - DEBUG - Trade exited at exit price: 1.09826
+2024-04-23 12:17:54,354 - DEBUG - Return of trade with leverage 10: 0.10655565023741978
+2024-04-23 12:17:54,354 - DEBUG - ==================================================
+2024-04-23 12:17:54,354 - DEBUG - 
+
+2024-04-23 12:17:54,357 - DEBUG - ==================================================
+2024-04-23 12:17:54,357 - DEBUG - NEW Short signal detected on 2023-04-12 12:33:00+00:00
+2024-04-23 12:17:54,357 - DEBUG - Short Trade entered on 2023-04-12 12:34:00+00:00 at entry price: 1.09804
+2024-04-23 12:18:01,495 - DEBUG - CLOSING Short position on 2023-04-17 14:14:00+00:00
+2024-04-23 12:18:01,495 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:18:01,496 - DEBUG - Trade exited at exit price: 1.09222
+2024-04-23 12:18:01,496 - DEBUG - Return of trade with leverage 10: 0.052999823321554035
+2024-04-23 12:18:01,496 - DEBUG - ==================================================
+2024-04-23 12:18:01,496 - DEBUG - 
+
+2024-04-23 12:18:01,540 - DEBUG - ==================================================
+2024-04-23 12:18:01,540 - DEBUG - NEW Long signal detected on 2023-04-17 14:39:00+00:00
+2024-04-23 12:18:01,541 - DEBUG - Long Trade entered on 2023-04-17 14:40:00+00:00 at entry price: 1.09132
+2024-04-23 12:19:04,174 - DEBUG - CLOSING Long position on 2023-05-24 12:23:00+00:00
+2024-04-23 12:19:04,175 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:19:04,176 - DEBUG - Trade exited at exit price: 1.07979
+2024-04-23 12:19:04,176 - DEBUG - Return of trade with leverage 10: -0.10564447549756247
+2024-04-23 12:19:04,176 - DEBUG - ==================================================
+2024-04-23 12:19:04,176 - DEBUG - 
+
+2024-04-23 12:19:04,178 - DEBUG - ==================================================
+2024-04-23 12:19:04,178 - DEBUG - NEW Short signal detected on 2023-05-24 12:23:00+00:00
+2024-04-23 12:19:04,179 - DEBUG - Short Trade entered on 2023-05-24 12:24:00+00:00 at entry price: 1.07942
+2024-04-23 12:19:53,381 - DEBUG - CLOSING Short position on 2023-06-23 02:05:00+00:00
+2024-04-23 12:19:53,381 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:19:53,383 - DEBUG - Trade exited at exit price: 1.09386
+2024-04-23 12:19:53,383 - DEBUG - Return of trade with leverage 10: -0.13376618183839548
+2024-04-23 12:19:53,383 - DEBUG - ==================================================
+2024-04-23 12:19:53,383 - DEBUG - 
+
+2024-04-23 12:19:53,389 - DEBUG - ==================================================
+2024-04-23 12:19:53,390 - DEBUG - NEW Long signal detected on 2023-06-23 02:05:00+00:00
+2024-04-23 12:19:53,390 - DEBUG - Long Trade entered on 2023-06-23 02:06:00+00:00 at entry price: 1.0941
+2024-04-23 12:20:17,728 - DEBUG - CLOSING Long position on 2023-07-07 12:35:00+00:00
+2024-04-23 12:20:17,728 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:20:17,729 - DEBUG - Trade exited at exit price: 1.09248
+2024-04-23 12:20:17,730 - DEBUG - Return of trade with leverage 10: -0.014805653962162074
+2024-04-23 12:20:17,730 - DEBUG - ==================================================
+2024-04-23 12:20:17,730 - DEBUG - 
+
+2024-04-23 12:20:17,733 - DEBUG - ==================================================
+2024-04-23 12:20:17,733 - DEBUG - NEW Short signal detected on 2023-07-07 12:35:00+00:00
+2024-04-23 12:20:17,733 - DEBUG - Short Trade entered on 2023-07-07 12:36:00+00:00 at entry price: 1.09302
+2024-04-23 12:20:35,204 - DEBUG - CLOSING Short position on 2023-07-19 06:41:00+00:00
+2024-04-23 12:20:35,204 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:20:35,205 - DEBUG - Trade exited at exit price: 1.12059
+2024-04-23 12:20:35,205 - DEBUG - Return of trade with leverage 10: -0.2522192649722765
+2024-04-23 12:20:35,205 - DEBUG - ==================================================
+2024-04-23 12:20:35,206 - DEBUG - 
+
+2024-04-23 12:20:35,207 - DEBUG - ==================================================
+2024-04-23 12:20:35,207 - DEBUG - NEW Long signal detected on 2023-07-19 06:41:00+00:00
+2024-04-23 12:20:35,208 - DEBUG - Long Trade entered on 2023-07-19 06:42:00+00:00 at entry price: 1.1204
+2024-04-23 12:21:12,466 - DEBUG - CLOSING Long position on 2023-08-10 07:16:00+00:00
+2024-04-23 12:21:12,467 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:21:12,468 - DEBUG - Trade exited at exit price: 1.1016
+2024-04-23 12:21:12,468 - DEBUG - Return of trade with leverage 10: -0.16778546947518908
+2024-04-23 12:21:12,468 - DEBUG - ==================================================
+2024-04-23 12:21:12,468 - DEBUG - 
+
+2024-04-23 12:21:12,469 - DEBUG - ==================================================
+2024-04-23 12:21:12,470 - DEBUG - NEW Short signal detected on 2023-08-10 07:16:00+00:00
+2024-04-23 12:21:12,470 - DEBUG - Short Trade entered on 2023-08-10 07:17:00+00:00 at entry price: 1.10166
+2024-04-23 12:21:17,497 - DEBUG - CLOSING Short position on 2023-08-14 12:44:00+00:00
+2024-04-23 12:21:17,497 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:21:17,498 - DEBUG - Trade exited at exit price: 1.09038
+2024-04-23 12:21:17,498 - DEBUG - Return of trade with leverage 10: 0.10238376994717215
+2024-04-23 12:21:17,498 - DEBUG - ==================================================
+2024-04-23 12:21:17,498 - DEBUG - 
+
+2024-04-23 12:21:17,500 - DEBUG - ==================================================
+2024-04-23 12:21:17,500 - DEBUG - NEW Long signal detected on 2023-08-14 12:44:00+00:00
+2024-04-23 12:21:17,500 - DEBUG - Long Trade entered on 2023-08-14 12:45:00+00:00 at entry price: 1.09064
+2024-04-23 12:21:30,638 - DEBUG - CLOSING Long position on 2023-08-22 07:20:00+00:00
+2024-04-23 12:21:30,639 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:21:30,640 - DEBUG - Trade exited at exit price: 1.0924
+2024-04-23 12:21:30,640 - DEBUG - Return of trade with leverage 10: 0.016136184258783392
+2024-04-23 12:21:30,640 - DEBUG - ==================================================
+2024-04-23 12:21:30,640 - DEBUG - 
+
+2024-04-23 12:21:30,643 - DEBUG - ==================================================
+2024-04-23 12:21:30,643 - DEBUG - NEW Short signal detected on 2023-08-22 07:20:00+00:00
+2024-04-23 12:21:30,643 - DEBUG - Short Trade entered on 2023-08-22 07:21:00+00:00 at entry price: 1.09244
+2024-04-23 12:21:32,966 - DEBUG - CLOSING Short position on 2023-08-23 07:34:00+00:00
+2024-04-23 12:21:32,966 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:21:32,967 - DEBUG - Trade exited at exit price: 1.08196
+2024-04-23 12:21:32,968 - DEBUG - Return of trade with leverage 10: 0.09592532679140328
+2024-04-23 12:21:32,968 - DEBUG - ==================================================
+2024-04-23 12:21:32,968 - DEBUG - 
+
+2024-04-23 12:21:32,971 - DEBUG - ==================================================
+2024-04-23 12:21:32,972 - DEBUG - NEW Long signal detected on 2023-08-23 07:35:00+00:00
+2024-04-23 12:21:32,972 - DEBUG - Long Trade entered on 2023-08-23 07:36:00+00:00 at entry price: 1.08183
+2024-04-23 12:21:43,083 - DEBUG - CLOSING Long position on 2023-08-29 17:02:00+00:00
+2024-04-23 12:21:43,083 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:21:43,084 - DEBUG - Trade exited at exit price: 1.08669
+2024-04-23 12:21:43,084 - DEBUG - Return of trade with leverage 10: 0.04492073431130554
+2024-04-23 12:21:43,084 - DEBUG - ==================================================
+2024-04-23 12:21:43,085 - DEBUG - 
+
+2024-04-23 12:21:43,087 - DEBUG - ==================================================
+2024-04-23 12:21:43,089 - DEBUG - NEW Short signal detected on 2023-08-29 17:02:00+00:00
+2024-04-23 12:21:43,090 - DEBUG - Short Trade entered on 2023-08-29 17:03:00+00:00 at entry price: 1.08686
+2024-04-23 12:22:25,845 - DEBUG - CLOSING Short position on 2023-09-25 14:26:00+00:00
+2024-04-23 12:22:25,845 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:22:25,847 - DEBUG - Trade exited at exit price: 1.05805
+2024-04-23 12:22:25,847 - DEBUG - Return of trade with leverage 10: 0.26505698342012785
+2024-04-23 12:22:25,847 - DEBUG - ==================================================
+2024-04-23 12:22:25,847 - DEBUG - 
+
+2024-04-23 12:22:25,849 - DEBUG - ==================================================
+2024-04-23 12:22:25,850 - DEBUG - NEW Long signal detected on 2023-09-25 14:26:00+00:00
+2024-04-23 12:22:25,850 - DEBUG - Long Trade entered on 2023-09-25 14:27:00+00:00 at entry price: 1.058
+2024-04-23 12:22:44,877 - DEBUG - CLOSING Long position on 2023-10-05 19:00:00+00:00
+2024-04-23 12:22:44,878 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:22:44,879 - DEBUG - Trade exited at exit price: 1.05504
+2024-04-23 12:22:44,879 - DEBUG - Return of trade with leverage 10: -0.027975357277883774
+2024-04-23 12:22:44,879 - DEBUG - ==================================================
+2024-04-23 12:22:44,879 - DEBUG - 
+
+2024-04-23 12:22:46,278 - DEBUG - ==================================================
+2024-04-23 12:22:46,280 - DEBUG - NEW Short signal detected on 2023-10-06 10:06:00+00:00
+2024-04-23 12:22:46,280 - DEBUG - Short Trade entered on 2023-10-06 10:07:00+00:00 at entry price: 1.056
+2024-04-23 12:23:16,601 - DEBUG - CLOSING Short position on 2023-10-25 09:27:00+00:00
+2024-04-23 12:23:16,601 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:23:16,602 - DEBUG - Trade exited at exit price: 1.05673
+2024-04-23 12:23:16,603 - DEBUG - Return of trade with leverage 10: -0.00691239488636179
+2024-04-23 12:23:16,603 - DEBUG - ==================================================
+2024-04-23 12:23:16,603 - DEBUG - 
+
+2024-04-23 12:23:16,605 - DEBUG - ==================================================
+2024-04-23 12:23:16,605 - DEBUG - NEW Long signal detected on 2023-10-25 09:27:00+00:00
+2024-04-23 12:23:16,605 - DEBUG - Long Trade entered on 2023-10-25 09:28:00+00:00 at entry price: 1.05677
+2024-04-23 12:23:25,503 - DEBUG - CLOSING Long position on 2023-10-31 09:59:00+00:00
+2024-04-23 12:23:25,503 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:23:25,504 - DEBUG - Trade exited at exit price: 1.06684
+2024-04-23 12:23:25,504 - DEBUG - Return of trade with leverage 10: 0.09528369560074669
+2024-04-23 12:23:25,504 - DEBUG - ==================================================
+2024-04-23 12:23:25,504 - DEBUG - 
+
+2024-04-23 12:23:25,506 - DEBUG - ==================================================
+2024-04-23 12:23:25,506 - DEBUG - NEW Short signal detected on 2023-10-31 09:59:00+00:00
+2024-04-23 12:23:25,506 - DEBUG - Short Trade entered on 2023-10-31 10:00:00+00:00 at entry price: 1.06614
+2024-04-23 12:23:28,255 - DEBUG - CLOSING Short position on 2023-11-01 13:19:00+00:00
+2024-04-23 12:23:28,256 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:23:28,257 - DEBUG - Trade exited at exit price: 1.05292
+2024-04-23 12:23:28,257 - DEBUG - Return of trade with leverage 10: 0.123990044459452
+2024-04-23 12:23:28,257 - DEBUG - ==================================================
+2024-04-23 12:23:28,257 - DEBUG - 
+
+2024-04-23 12:23:28,260 - DEBUG - ==================================================
+2024-04-23 12:23:28,261 - DEBUG - NEW Long signal detected on 2023-11-01 13:20:00+00:00
+2024-04-23 12:23:28,261 - DEBUG - Long Trade entered on 2023-11-01 13:21:00+00:00 at entry price: 1.05293
+2024-04-23 12:23:30,346 - DEBUG - CLOSING Long position on 2023-11-02 12:49:00+00:00
+2024-04-23 12:23:30,346 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:23:30,347 - DEBUG - Trade exited at exit price: 1.06624
+2024-04-23 12:23:30,347 - DEBUG - Return of trade with leverage 10: 0.12640031436087995
+2024-04-23 12:23:30,347 - DEBUG - ==================================================
+2024-04-23 12:23:30,347 - DEBUG - 
+
+2024-04-23 12:23:30,352 - DEBUG - ==================================================
+2024-04-23 12:23:30,352 - DEBUG - NEW Short signal detected on 2023-11-02 12:50:00+00:00
+2024-04-23 12:23:30,352 - DEBUG - Short Trade entered on 2023-11-02 12:51:00+00:00 at entry price: 1.0662
+2024-04-23 12:24:01,426 - DEBUG - CLOSING Short position on 2023-11-22 15:01:00+00:00
+2024-04-23 12:24:01,427 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:24:01,428 - DEBUG - Trade exited at exit price: 1.0861
+2024-04-23 12:24:01,428 - DEBUG - Return of trade with leverage 10: -0.18663109172763215
+2024-04-23 12:24:01,428 - DEBUG - ==================================================
+2024-04-23 12:24:01,428 - DEBUG - 
+
+2024-04-23 12:24:01,430 - DEBUG - ==================================================
+2024-04-23 12:24:01,431 - DEBUG - NEW Long signal detected on 2023-11-22 15:01:00+00:00
+2024-04-23 12:24:01,431 - DEBUG - Long Trade entered on 2023-11-22 15:02:00+00:00 at entry price: 1.08618
+2024-04-23 12:24:31,784 - DEBUG - CLOSING Long position on 2023-12-12 06:59:00+00:00
+2024-04-23 12:24:31,785 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:24:31,786 - DEBUG - Trade exited at exit price: 1.07795
+2024-04-23 12:24:31,786 - DEBUG - Return of trade with leverage 10: -0.07576482627188831
+2024-04-23 12:24:31,786 - DEBUG - ==================================================
+2024-04-23 12:24:31,786 - DEBUG - 
+
+2024-04-23 12:24:31,788 - DEBUG - ==================================================
+2024-04-23 12:24:31,789 - DEBUG - NEW Short signal detected on 2023-12-12 06:59:00+00:00
+2024-04-23 12:24:31,789 - DEBUG - Short Trade entered on 2023-12-12 07:00:00+00:00 at entry price: 1.07777
+2024-04-23 12:24:59,295 - DEBUG - CLOSING Short position on 2023-12-29 09:35:00+00:00
+2024-04-23 12:24:59,295 - DEBUG - Reason: ['Change of Signal']
+2024-04-23 12:24:59,296 - DEBUG - Trade exited at exit price: 1.10464
+2024-04-23 12:24:59,296 - DEBUG - Return of trade with leverage 10: -0.24929362572719785
+2024-04-23 12:24:59,296 - DEBUG - ==================================================
+2024-04-23 12:24:59,296 - DEBUG - 
+
+2024-04-23 12:24:59,298 - DEBUG - ==================================================
+2024-04-23 12:24:59,298 - DEBUG - NEW Long signal detected on 2023-12-29 09:35:00+00:00
+2024-04-23 12:24:59,298 - DEBUG - Long Trade entered on 2023-12-29 09:36:00+00:00 at entry price: 1.1048
+2024-04-23 12:25:00,476 - DEBUG - CLOSING Long position on 2023-12-29 21:56:00+00:00
+2024-04-23 12:25:00,476 - DEBUG - Reason: End of backtesting, closing all positions.
+2024-04-23 12:25:00,476 - DEBUG - Trade exited at exit price: 1.10374
+2024-04-23 12:25:00,476 - DEBUG - Return of trade with leverage 10: -0.009593825126719916
+2024-04-23 12:25:00,477 - DEBUG - Final wealth: 0.7859484011280677
+2024-04-23 12:25:00,477 - DEBUG - Backtesting completed.

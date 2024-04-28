@@ -22,3 +22,9 @@ def convert_unix_to_datetime(timestamp):
         return date_time.strftime('%Y-%m-%d %H:%M:%S')
     else:
         return timestamp
+    
+
+if __name__ == "__main__":
+    start_time, end_time    = 1563535876, 1713535876
+    print(convert_unix_to_datetime(start_time))
+    print(convert_unix_to_datetime(end_time))

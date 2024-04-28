@@ -1,11 +1,10 @@
 import pandas as pd
 import numpy as np
-from Backtest.utils import backtest_metrics, save_plot_strategy, market_trading_rules, convert_interval, check_column_index, check_expected_bars
-from DataPipeline.make_data import make_filename
-from DataPipeline.technicals_indicators import TechnicalIndicators
-import time
+from Backtest.utils import market_trading_rules, check_column_index, check_expected_bars
 import os
 from matplotlib import pylab as pl
+from Backtest.utils import set_logs
+
 
 class Backtest:
     def __init__(self, strategy_df: pd.DataFrame, symbol: str, market: str, 
@@ -52,14 +51,20 @@ class Backtest:
         
         if self.end_date:
             self.strategy_df = self.strategy_df.loc[self.strategy_df.index<=self.end_date]
-
-        self.data_checks()
+        
 
         self.first_date = self.strategy_df.index[0]
         self.last_date = self.strategy_df.index[-1]
+    
+        
+        log_file = f"logs-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}.log"
+        self.logger = set_logs(log_file)
+
+        self.data_checks()
 
         if not os.path.exists("Data/Backtest"):
             os.mkdir("Data/Backtest")
+
 
         self.backtest_df = self.Backtest_strategy()
         self.metrics = self.backtest_metrics()
@@ -86,7 +91,7 @@ class Backtest:
     
     def data_checks(self):
 
-        print('Initializing data checks...')
+        self.logger.debug('Initializing data checks...')
         if 'signal' not in self.strategy_df.columns:
             raise ValueError('"signal" column missing from df')
         
@@ -111,7 +116,7 @@ class Backtest:
         if self.end_date and len(self.strategy_df) == 0:
                 raise ValueError(f'{self.end_date} not in dataframe, please choose a more recent end_date')
     
-        print('Data checks completed.')
+        self.logger.debug('Data checks completed.')
 
     
     def Backtest_strategy(self):
@@ -125,7 +130,7 @@ class Backtest:
         self.strategy_df["Take Profit"] = False
         self.strategy_df[self.buy_hold_column] = self.strategy_df[self.price_column].pct_change()
         # Loop over price time-series
-        print(f'Initializing backtesting...')
+        self.logger.debug(f'Initializing backtesting...')
         while i0 < len(self.strategy_df) - 1:
 
             bar = self.strategy_df.index[i0]
@@ -141,14 +146,14 @@ class Backtest:
             if self.position == 0:
                 self.position  = entry_signal
                 if self.position != 0:
-                    print('='*50)
+                    self.logger.debug('='*50)
                     entry_price = self.strategy_df.iloc[i0+1][self.price_column] #When entry signal is observed at i0, trade is entered at i0+1
                     if self.position == 1:
                         direction = 'Long'
                     else:
                         direction = 'Short'
-                    print(f'NEW {direction} signal detected on {bar}')
-                    print(f'{direction} Trade entered on {next_bar} at entry price: {entry_price}')
+                    self.logger.debug(f'NEW {direction} signal detected on {bar}')
+                    self.logger.debug(f'{direction} Trade entered on {next_bar} at entry price: {entry_price}')
 
             else:
                 current_price = self.strategy_df.loc[self.strategy_df.index[i0], self.price_column]
@@ -161,15 +166,15 @@ class Backtest:
                 }
                     
                 if any(condition for condition, _ in exit_conditions.values()): #We exit the position as soon as we have a signal in the opposite direction. (OR TAKE PROFIT, TAKE LOSS)
-                    print(f'CLOSING {direction} position on {next_bar}')
+                    self.logger.debug(f'CLOSING {direction} position on {next_bar}')
                     true_conditions = [description for condition, description in exit_conditions.values() if condition]
-                    print(f'Reason: {true_conditions}')
+                    self.logger.debug(f'Reason: {true_conditions}')
                     exit_price = self.strategy_df.iloc[i0+1][self.price_column] #When exit signal is observed at i0, trade is exited at i0+1
                     trade_return = self.calculate_trade_return(entry_price, exit_price)
-                    print(f'Trade exited at exit price: {exit_price}')
-                    print(f'Return of trade with leverage {self.leverage}: {trade_return}')
-                    print('='*50)
-                    print('\n')
+                    self.logger.debug(f'Trade exited at exit price: {exit_price}')
+                    self.logger.debug(f'Return of trade with leverage {self.leverage}: {trade_return}')
+                    self.logger.debug('='*50)
+                    self.logger.debug('\n')
                     self.strategy_df.loc[self.strategy_df.index[i0+1], "Realized_Return"] = trade_return
                     self.position = 0
             
@@ -187,14 +192,18 @@ class Backtest:
         if self.position != 0: #If a position is still open at last bar, close it
             exit_price = self.strategy_df.iloc[i0][self.price_column]
             trade_return = self.calculate_trade_return(entry_price, exit_price)
+            self.logger.debug(f'CLOSING {direction} position on {bar}')
+            self.logger.debug('Reason: End of backtesting, closing all positions.')
+            self.logger.debug(f'Trade exited at exit price: {exit_price}')
+            self.logger.debug(f'Return of trade with leverage {self.leverage}: {trade_return}')
             self.position = 0
             self.strategy_df.loc[self.strategy_df.index[i0], "Realized_Return"] = trade_return
             self.strategy_df.loc[self.strategy_df.index[i0], "position"] = self.position
             final_wealth = self.update_wealth(wealth, buy_and_hold_return)
             self.strategy_df.loc[self.strategy_df.index[i0], "Wealth"] = final_wealth
-            print(f'Final wealth: {final_wealth}')
+            self.logger.debug(f'Final wealth: {final_wealth}')
         
-        print(f'Backtesting completed.')
+        self.logger.debug(f'Backtesting completed.')
         
         self.strategy_df.to_csv(f"Data/Backtest/{self.market}-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-Backtest_DF.csv")
 

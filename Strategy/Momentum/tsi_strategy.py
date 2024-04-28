@@ -1,15 +1,15 @@
 import pandas as pd
 from typing import List
 
-class RSIStrategy:
+class TSIStrategy:
     def __init__(self, strategy_df: pd.DataFrame, indicators_cols: List[str], 
                  long_thres: float, short_thres: float):
         """
-        Initialize the RSI strategy with thresholds.
+        Initialize the TSI strategy with thresholds.
 
         Args:
         - price_df:    Close price time-series. Index must be timestamp.
-        - indicators_df: Time-series containing one or more Stochastic RSI indicators (with different spans). Must only contain Stochastic RSI columns + timestamp as index.
+        - indicators_df: Time-series containing one or more Stochastic TSI indicators (with different spans). Must only contain Stochastic TSI columns + timestamp as index.
         - indicators_cols: List of indicators used to build the signals.
         - long_thres: Float between 0 and 1. Threshold for generating a long signal.
         - short_thres: Float between 0 and 1. Threshold for generating a short signal.
