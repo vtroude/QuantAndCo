@@ -71,7 +71,7 @@ class Backtest:
         self.plot_equity_curve()
 
     
-    def update_wealth(self, previous_wealth, buy_and_hold_return):
+    def update_wealth(self, previous_wealth, buy_and_hold_return, position_change):
         """
         Current Wealth = Previous Wealth * (1 + position(-1,0,1) * Buy/Hold_Return * Leverage)
         Examples:
@@ -81,7 +81,11 @@ class Backtest:
         If position is 0, current wealth = previous wealth
 
         """
-        return previous_wealth * (1 + self.position * buy_and_hold_return * self.leverage * (1 - self.slippage - self.fees))
+        capital_appreciation = buy_and_hold_return * self.leverage
+        total_fees = self.fees * self.leverage
+        total_slippage = self.slippage * self.leverage
+        new_wealth = previous_wealth * (1 + self.position * capital_appreciation) - position_change * (total_fees + total_slippage)
+        return new_wealth
 
     def calculate_trade_return(self, entry_price, exit_price):
         return self.position * (exit_price/entry_price - 1) * self.leverage * (1 - self.slippage - self.fees)
@@ -135,17 +139,17 @@ class Backtest:
 
             bar = self.signal_df.index[i0]
             next_bar = self.signal_df.index[i0+1]
-            previous_wealth = self.signal_df.loc[self.signal_df.index[i0-1], "Wealth"]
             wealth = self.signal_df.loc[self.signal_df.index[i0], "Wealth"]
-            buy_and_hold_return = self.signal_df.loc[self.signal_df.index[i0], self.buy_hold_column]
+            buy_and_hold_return = self.signal_df.loc[self.signal_df.index[i0+1], self.buy_hold_column] #buy and hold return of next bar, because it is only used for wealth calculated which is updated a next bar 
             entry_signal = self.signal_df.loc[self.signal_df.index[i0], "signal"]
             exit_signal = self.signal_df.loc[self.signal_df.index[i0], "exit_signal"]
-            wealth_change = wealth / previous_wealth - 1
+            position_change = 0
             unrealized_pnl = self.signal_df.loc[self.signal_df.index[i0], "Unrealized_PnL"]
 
             if self.position == 0:
-                self.position  = entry_signal
+                self.position  = entry_signal 
                 if self.position != 0:
+                    position_change = 1
                     self.logger.debug('='*50)
                     entry_price = self.signal_df.iloc[i0+1][self.price_column] #When entry signal is observed at i0, trade is entered at i0+1
                     if self.position == 1:
@@ -167,6 +171,7 @@ class Backtest:
                     
                 if any(condition for condition, _ in exit_conditions.values()): #We exit the position as soon as we have a signal in the opposite direction. (OR TAKE PROFIT, TAKE LOSS)
                     self.logger.debug(f'CLOSING {direction} position on {next_bar}')
+                    position_change = 1
                     true_conditions = [description for condition, description in exit_conditions.values() if condition]
                     self.logger.debug(f'Reason: {true_conditions}')
                     exit_price = self.signal_df.iloc[i0+1][self.price_column] #When exit signal is observed at i0, trade is exited at i0+1
@@ -184,7 +189,7 @@ class Backtest:
             self.signal_df.loc[self.signal_df.index[i0], "Take Profit"] = True if unrealized_pnl>=self.take_profit else False
             self.signal_df.loc[self.signal_df.index[i0], "Stop Loss"] = True if unrealized_pnl<=self.stop_loss else False
             self.signal_df.loc[self.signal_df.index[i0], "position"] = self.position #We now assume position is immediately updated once signal is observed, however we apply negative slippage to the execution price
-            updated_wealth = self.update_wealth(wealth, buy_and_hold_return)
+            updated_wealth = self.update_wealth(wealth, buy_and_hold_return, position_change)
             #self.logger.debug(f'Wealth: {updated_wealth}')
             self.signal_df.loc[self.signal_df.index[i0+1], "Wealth"] = updated_wealth #wealth is updated one bar after the position is entered
 
@@ -201,7 +206,7 @@ class Backtest:
             self.position = 0
             self.signal_df.loc[self.signal_df.index[i0], "Realized_Return"] = trade_return
             self.signal_df.loc[self.signal_df.index[i0], "position"] = self.position
-            final_wealth = self.update_wealth(wealth, buy_and_hold_return)
+            final_wealth = self.update_wealth(wealth, buy_and_hold_return, position_change=1)
             self.signal_df.loc[self.signal_df.index[i0], "Wealth"] = final_wealth
             self.logger.debug(f'Final wealth: {final_wealth}')
         
