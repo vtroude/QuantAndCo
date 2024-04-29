@@ -183,10 +183,10 @@ class Backtest:
 
             self.signal_df.loc[self.signal_df.index[i0], "Take Profit"] = True if unrealized_pnl>=self.take_profit else False
             self.signal_df.loc[self.signal_df.index[i0], "Stop Loss"] = True if unrealized_pnl<=self.stop_loss else False
-            self.signal_df.loc[self.signal_df.index[i0+1], "position"] = self.position #Position is updated at i0+1 based on signal observed at i0
+            self.signal_df.loc[self.signal_df.index[i0], "position"] = self.position #We now assume position is immediately updated once signal is observed, however we apply negative slippage to the execution price
             updated_wealth = self.update_wealth(wealth, buy_and_hold_return)
-            self.logger.debug(f'Wealth: {updated_wealth}')
-            self.signal_df.loc[self.signal_df.index[i0+1], "Wealth"] = updated_wealth
+            #self.logger.debug(f'Wealth: {updated_wealth}')
+            self.signal_df.loc[self.signal_df.index[i0+1], "Wealth"] = updated_wealth #wealth is updated one bar after the position is entered
 
             
             i0+=1

@@ -49,13 +49,14 @@ def adf_test(timeseries):
         
     return dfoutput
 
-def OLS_reg(x, y, print_results=True):
+def OLS_reg(x, y, print_results=False):
     x = sm.add_constant(x)
     model = sm.OLS(y, x)
     results = model.fit()
     if print_results:
         print(results.summary())
     return model
+
 
 def auto_reg(timeseries, lag=1):
     timeseries = assert_timestamp(timeseries)
@@ -155,10 +156,10 @@ def Check_Mean_Reversion(timeseries):
     #1. We plot the timeseries - a mean reverting time series should be "pulled back" to its mean
     #when it deviates too much from it
     timeseries = assert_timestamp(timeseries)
-    #mean = np.mean(timeseries, axis=0).values[0]
-    #stdev = np.std(timeseries, axis=0).values[0]
-    mean = timeseries.mean(axis=0)
-    stdev = timeseries.std(axis=0)
+    mean = np.mean(timeseries, axis=0).values[0]
+    stdev = np.std(timeseries, axis=0).values[0]
+    #mean = timeseries.mean(axis=0)
+    #stdev = timeseries.std(axis=0)
     ax = timeseries.plot(figsize=(10, 6), title='Price Time Series with Mean and StdDev Lines')
     # Add horizontal lines for mean, mean + 3*stdev, and mean - 3*stdev
     ax.axhline(mean, color='red', linestyle='--', linewidth=2, label='Mean')

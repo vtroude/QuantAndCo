@@ -1,6 +1,7 @@
 from Research.statistical_tests import adf_test, OLS_reg, get_half_life, Check_Mean_Reversion
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 def PairsTrading(x, y):
 
@@ -23,8 +24,47 @@ def PairsTrading(x, y):
         sign = '-'
     else:
         sign = '+'
-    print(f'Y = {intercept} {sign} {hedge_ratio} * X')
+    print(f'Y = {intercept: .2f} {sign} {hedge_ratio: .2f} * X')
     return resid
+
+
+def Pairs_Trading(df, asset_x, asset_y, entry_long, entry_short, exit_long, exit_short, end_train_period):
+
+    lookback_period = df.reset_index().loc[df.index>=end_train_period].index[0]
+    y = df[[asset_y]]
+    x = df[[asset_x]]
+    y_train = y.iloc[:lookback_period]
+    x_train = x.iloc[:lookback_period]
+    ols = OLS_reg(x_train, y_train)
+    results = ols.fit()
+    print(results.summary())
+    intercept, hedge_ratio = results.params
+    y_hat = ols.predict(results.params)
+    resid = y_train.values.reshape(-1,) - y_hat
+    resid_mean = np.mean(resid)
+    resid_std = np.std(resid)
+    y_train["residuals"] = resid
+    #Check_Mean_Reversion(y_train[["residuals"]])
+    y_test = y.iloc[lookback_period:]
+    x_test = x.iloc[lookback_period:]
+    y_test["y_hat"] = intercept + hedge_ratio * x_test
+    resid_test = y_test[asset_y] - y_test["y_hat"]
+    resid_zscore = (resid_test - resid_mean) / resid_std
+    df['signal'] = 0
+    df['exit_signal'] = 0
+    df['z_score'] = np.nan
+    df.loc[df.index[lookback_period:], "z_score"] = resid_zscore
+    df.loc[df.index[lookback_period:], "signal"] = (resid_zscore <= entry_long) *1 + (resid_zscore >= entry_short) * -1
+    df.loc[df.index[lookback_period:], "exit_signal"] = (resid_zscore >= exit_long) * -1 + (resid_zscore <= exit_short) * 1
+    df["Portfolio"] = df[asset_y] - hedge_ratio * df[asset_x]
+    df["Hedge_Ratio"] = hedge_ratio
+
+    df_ = df[["Portfolio", "Hedge_Ratio", "z_score", "signal", "exit_signal"]].iloc[lookback_period:]
+
+    return df_
+
+ 
+
 
 if __name__ == "__main__":
 
@@ -37,9 +77,13 @@ if __name__ == "__main__":
     x.set_index("timestamp", inplace=True)
     x = x[["Close"]].rename(columns={"Close": "GBP_USD"})
     df = pd.merge(x, y, right_index=True, left_index=True, how="inner")
-    resid = PairsTrading(df.EUR_USD, df.GBP_USD)
+
+    pairs_trading = Pairs_Trading(df, "EUR_USD", "GBP_USD", entry_long=-1, 
+                                  exit_long=-0.5, entry_short=1, exit_short=0.5, end_train_period="2023-01-01")
+    #print(pairs_trading.loc[pairs_trading.signal==1])
+    #resid = PairsTrading(df.EUR_USD, df.GBP_USD)
     #print(resid)
-    Check_Mean_Reversion(resid)
+    #Check_Mean_Reversion(resid)
 
 
     #ax = df[['EUR_USD', 'GBP_USD']].plot(figsize=(8, 6), title='EUR/USD and GBP/USD')
