@@ -103,4 +103,10 @@ if __name__ == '__main__':
     backtesting = Backtest(signal_df=pairs_trading, symbol='EUR_USD-GBP_USD', market='forex',
                            interval='1m', start_date=backtest_start_date, end_date=backtest_end_date, leverage=3,
                            fees=0.00007, slippage=0.01/100, 
-                           take_profit=0.075, stop_loss=-0.025)
+                           take_profit=100, stop_loss=-100)
+    
+
+    #1. Step 1: Improve pairs trading model by re-computing beta and residuals every x-period. How do we define x-period?
+    # -> 
+    #2. Step 2: Optimize entry and exit z-scores -> record Total Performance -> perform Grid Search
+    #3. Step 3: Optimize take profit and stop loss based on optimal entry and exit z-scores

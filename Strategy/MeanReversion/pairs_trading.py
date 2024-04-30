@@ -28,43 +28,112 @@ def PairsTrading(x, y):
     return resid
 
 
-def Pairs_Trading(df, asset_x, asset_y, entry_long, entry_short, exit_long, exit_short, end_train_period):
-
-    lookback_period = df.reset_index().loc[df.index>=end_train_period].index[0]
+def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_period, window):
+    """
+    The strategy is trained with a train set and a validation set.
+    The first hedge ratio is estimated on the train set.
+    Then, it is dynamically adjusted every "window" bar by adding the new data, and used for the subsequent "window" bars.
+    """
+    train_index = df.reset_index().loc[df.index>=end_train_period].index[0]
     y = df[[asset_y]]
     x = df[[asset_x]]
-    y_train = y.iloc[:lookback_period]
-    x_train = x.iloc[:lookback_period]
+    y_train = y.iloc[:train_index]
+    x_train = x.iloc[:train_index]
     ols = OLS_reg(x_train, y_train)
     results = ols.fit()
     print(results.summary())
     intercept, hedge_ratio = results.params
     y_hat = ols.predict(results.params)
     resid = y_train.values.reshape(-1,) - y_hat
-    resid_mean = np.mean(resid)
-    resid_std = np.std(resid)
+    resid_means = [np.mean(resid)]
+    resid_stds = [np.std(resid)]
     y_train["residuals"] = resid
+    betas = [hedge_ratio]
+    alphas = [intercept]
     #Check_Mean_Reversion(y_train[["residuals"]])
-    y_test = y.iloc[lookback_period:]
-    x_test = x.iloc[lookback_period:]
-    y_test["y_hat"] = intercept + hedge_ratio * x_test
-    resid_test = y_test[asset_y] - y_test["y_hat"]
-    resid_zscore = (resid_test - resid_mean) / resid_std
+
     df['signal'] = 0
     df['exit_signal'] = 0
     df['z_score'] = np.nan
-    df.loc[df.index[lookback_period:], "z_score"] = resid_zscore
-    df.loc[df.index[lookback_period:], "signal"] = (resid_zscore <= entry_long) *1 + (resid_zscore >= entry_short) * -1
-    df.loc[df.index[lookback_period:], "exit_signal"] = (resid_zscore >= exit_long) * -1 + (resid_zscore <= exit_short) * 1
-    df["Portfolio"] = df[asset_y] - hedge_ratio * df[asset_x]
-    df["Hedge_Ratio"] = hedge_ratio
+    df['hedge_ratio'] = np.nan
 
-    df_ = df[["Portfolio", "Hedge_Ratio", "z_score", "signal", "exit_signal"]].iloc[lookback_period:]
+    df_vali = df.iloc[train_index:]
+    y_vali = y.iloc[train_index:]
+    x_vali = x.iloc[train_index:]
+    n_windows = int( len(y_vali) / window )
+    if n_windows < 3:
+        raise ValueError(f'{window} is too large for dataset')
+    
+    for t in range(n_windows):
+        w_init = t * window
+        w_last = (t+1) * window
+        sub_y_vali = y_vali.iloc[w_init:w_last]
+        sub_x_vali = x_vali.iloc[w_init:w_last]
+        beta = betas[-1]
+        print("Beta:")
+        print(beta)
+        alpha = alphas[-1]
+        sub_y_vali["y_hat"] = alpha + beta * sub_x_vali
+        resid_vali = sub_y_vali[asset_y] - sub_y_vali["y_hat"]
+        resid_mean, resid_std = resid_means[-1], resid_stds[-1]
+        resid_zscore = (resid_vali - resid_mean) / resid_std
+        df_vali.loc[df_vali.index[w_init:w_last], "hedge_ratio"] = beta
+        df_vali.loc[df_vali.index[w_init:w_last], "z_score"] = resid_zscore
+        df_vali.loc[df_vali.index[w_init:w_last], "signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
+        df_vali.loc[df_vali.index[w_init:w_last], "exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
+        df_vali.loc[df_vali.index[w_init:w_last], "Portfolio"] = df_vali.loc[df_vali.index[w_init:w_last], asset_y] - beta * df_vali.loc[df_vali.index[w_init:w_last], asset_x]
+
+        new_x_train = x.iloc[:w_last]
+        new_y_train = y.iloc[:w_last]
+        ols = OLS_reg(new_x_train, new_y_train)
+        results = ols.fit()
+        new_alpha, new_beta = results.params
+        print("new beta:")
+        print(new_beta)
+        new_y_hat = ols.predict(results.params)
+        new_resid = new_y_train.values.reshape(-1,) - new_y_hat
+
+        resid_means.append(np.mean(new_resid))
+        resid_stds.append(np.std(new_resid))
+        betas.append(new_beta)
+        alphas.append(new_alpha)
+
+    if w_last < len(y_vali) - 1:
+        sub_y_vali = y_vali.iloc[w_last:]
+        sub_x_vali = x_vali.iloc[w_last:]
+        beta = betas[-1]
+        alpha = alphas[-1]
+        sub_y_vali["y_hat"] = alpha + beta * sub_x_vali
+        resid_vali = sub_y_vali[asset_y] - sub_y_vali["y_hat"]
+        resid_mean, resid_std = resid_means[-1], resid_stds[-1]
+        resid_zscore = (resid_vali - resid_mean) / resid_std
+        df_vali.loc[df_vali.index[w_last:], "hedge_ratio"] = beta
+        df_vali.loc[df_vali.index[w_last:], "z_score"] = resid_zscore
+        df_vali.loc[df_vali.index[w_last:], "signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
+        df_vali.loc[df_vali.index[w_last:], "exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
+        df_vali.loc[df_vali.index[w_last:], "Portfolio"] = df_vali.loc[df_vali.index[w_last:], asset_y] - beta * df_vali.loc[df_vali.index[w_last:], asset_x]
+
+    df_ = df_vali[[asset_y, asset_x, "hedge_ratio", "Portfolio", "z_score", "signal", "exit_signal"]]
 
     return df_
 
- 
+    #return pd.concat([df.iloc[:train_index][[asset_y, asset_x, "hedge_ratio", "z_score", "signal", "exit_signal"]], df_], axis=0)
 
+    #y_vali["y_hat"] = intercept + hedge_ratio * x_vali
+    #resid_test = y_vali[asset_y] - y_vali["y_hat"]
+    #resid_zscore = (resid_test - resid_mean) / resid_std
+    #df['signal'] = 0
+    #df['exit_signal'] = 0
+    #df['z_score'] = np.nan
+    #df.loc[df.index[train_index:], "z_score"] = resid_zscore
+    #df.loc[df.index[train_index:], "signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
+    #df.loc[df.index[train_index:], "exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
+    #df["Portfolio"] = df[asset_y] - hedge_ratio * df[asset_x]
+    #df["Hedge_Ratio"] = hedge_ratio
+
+    #df_ = df[["Portfolio", "Hedge_Ratio", "z_score", "signal", "exit_signal"]].iloc[train_index:]
+
+    #return df_
 
 if __name__ == "__main__":
 
@@ -78,8 +147,14 @@ if __name__ == "__main__":
     x = x[["Close"]].rename(columns={"Close": "GBP_USD"})
     df = pd.merge(x, y, right_index=True, left_index=True, how="inner")
 
-    pairs_trading = Pairs_Trading(df, "EUR_USD", "GBP_USD", entry_long=-1, 
-                                  exit_long=-0.5, entry_short=1, exit_short=0.5, end_train_period="2023-01-01")
+    df = df.loc[df.index<='2023-01-01']
+
+    pairs_trading = Pairs_Trading(df, "EUR_USD", "GBP_USD", entry_zScore=1, exit_zScore=0.5, end_train_period="2022-01-01",
+                                  window=10_000)
+    
+    print(pairs_trading.hedge_ratio.std())
+    
+    pairs_trading.to_csv('Data/Backtest/PairsTradingStrategy-EUR_USD-GBP_USD.csv')
     #print(pairs_trading.loc[pairs_trading.signal==1])
     #resid = PairsTrading(df.EUR_USD, df.GBP_USD)
     #print(resid)

@@ -216,7 +216,7 @@ class Backtest:
 
         return self.signal_df
     
-    def backtest_metrics(self):
+    def backtest_metrics(self, return_metric=None):
 
         wealth_df = self.backtest_df['Wealth']
         check_column_index(wealth_df, "timestamp")
@@ -237,6 +237,20 @@ class Backtest:
         df_metrics.columns = ['Total Performance [%]', 'CAGR [%]', 'Avg. Return (Ann.) [%]', 'Volatility (Ann.) [%]', 'Sharpe Ratio (Ann.)']
         df_metrics.index.name = 'Portfolio Metrics'
         df_metrics.to_csv(f"Data/Backtest/{self.market}-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-backtest_metrics.csv")
+        if return_metric:
+            if return_metric == 'total_perf':
+                return total_perf
+            elif return_metric == 'CAGR':
+                return CAGR
+            elif return_metric == 'avg_ann_return':
+                return avg_ann_return
+            elif return_metric == 'ann_vol':
+                return ann_vol
+            elif return_metric == 'sharpe':
+                return sharpe
+            else:
+                raise ValueError(f"Metric {return_metric} not found")
+            
         return df_metrics
 
     def plot_equity_curve(self):
