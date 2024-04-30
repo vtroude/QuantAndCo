@@ -40,3 +40,4 @@ oandapyV20
 logging
 statsmodels
 arch
+optuna

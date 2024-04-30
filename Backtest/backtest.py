@@ -193,6 +193,10 @@ class Backtest:
             #self.logger.debug(f'Wealth: {updated_wealth}')
             self.signal_df.loc[self.signal_df.index[i0+1], "Wealth"] = updated_wealth #wealth is updated one bar after the position is entered
 
+            if updated_wealth <= 0.0001:
+                self.logger.debug('Backtested ended before end date. Reason: Wealth dropped to zero.')
+                return self.signal_df
+
             
             i0+=1
         
