@@ -37,6 +37,23 @@ def get_ols_results(x, y):
 
     return alpha, beta, resid
 
+def pairs_trading_signals(df, asset_y, asset_x, alpha, beta, resids, entry_zScore, exit_zScore):
+
+    df['hedge_ratio'] = beta
+
+    df["y_hat"] = alpha + beta * df[asset_x]
+    resid_vali = df[asset_y] - df["y_hat"]
+    resid_mean, resid_std = np.mean(resids), np.std(resids)
+    resid_zscore = (resid_vali - resid_mean) / resid_std
+    df["z_score"] = resid_zscore
+    df["signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
+    df["exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
+    df["Portfolio"] = df[asset_y] - beta * df[asset_x]
+
+    return df
+
+
+
 
 def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_period, dynamic_regression=False,
                   window=1000):
