@@ -1,0 +1,6 @@
+2024-05-01 12:56:41,641 - DEBUG - Initializing data checks...
+2024-05-01 12:56:41,648 - DEBUG - Data checks completed.
+2024-05-01 12:56:41,662 - DEBUG - Initializing backtesting...
+2024-05-01 12:56:41,691 - DEBUG - ==================================================
+2024-05-01 12:56:41,692 - DEBUG - NEW Long signal detected on 2022-06-01 00:02:00+00:00
+2024-05-01 12:56:41,692 - DEBUG - Long Trade entered on 2022-06-01 00:03:00+00:00 at entry price: 0.3057664564141537

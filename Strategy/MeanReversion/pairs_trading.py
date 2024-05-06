@@ -39,6 +39,11 @@ def get_ols_results(x, y):
 
 def pairs_trading_signals(df, asset_y, asset_x, alpha, beta, resids, entry_zScore, exit_zScore):
 
+    """
+    Hedge ratio and residuals are estimated on a train data. Then, signals are generated on a subsequent test data.
+    Later on, we will want to dynamically re-estimate the hedge ratio.
+    """
+
     df['hedge_ratio'] = beta
 
     df["y_hat"] = alpha + beta * df[asset_x]
@@ -48,7 +53,7 @@ def pairs_trading_signals(df, asset_y, asset_x, alpha, beta, resids, entry_zScor
     df["z_score"] = resid_zscore
     df["signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
     df["exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
-    df["Portfolio"] = df[asset_y] - beta * df[asset_x]
+    df["Close"] = df[asset_y] - beta * df[asset_x]
 
     return df
 

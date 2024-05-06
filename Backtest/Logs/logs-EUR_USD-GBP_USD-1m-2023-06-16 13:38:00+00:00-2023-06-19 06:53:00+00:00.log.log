@@ -1,0 +1,12 @@
+2024-05-01 13:11:04,391 - DEBUG - Initializing data checks...
+2024-05-01 13:11:04,393 - DEBUG - Data checks completed.
+2024-05-01 13:11:04,399 - DEBUG - Initializing backtesting...
+2024-05-01 13:11:04,399 - DEBUG - ==================================================
+2024-05-01 13:11:04,400 - DEBUG - NEW Long signal detected on 2023-06-16 13:39:00+00:00
+2024-05-01 13:11:04,400 - DEBUG - Long Trade entered on 2023-06-16 13:40:00+00:00 at entry price: 0.3146274624784824
+2024-05-01 13:11:05,654 - DEBUG - CLOSING Long position on 2023-06-19 06:52:00+00:00
+2024-05-01 13:11:05,654 - DEBUG - Reason: End of backtesting, closing all positions.
+2024-05-01 13:11:05,655 - DEBUG - Trade exited at exit price: 0.3130425671022491
+2024-05-01 13:11:05,655 - DEBUG - Return of trade with leverage 3: -0.015109545093772884
+2024-05-01 13:11:05,655 - DEBUG - Final wealth: 0.9843299780897381
+2024-05-01 13:11:05,655 - DEBUG - Backtesting completed.
