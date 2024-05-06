@@ -103,7 +103,7 @@ def get_and_save_timeseries(
         start_str, end_str = start_time, end_time
 
     # Save OHLC data
-    data.to_csv(make_filename(market, symbol, interval, start_time, end_time, "OHLC"))
+    data.to_csv(make_filename(market, symbol, interval, start_str, end_str, "OHLC"))
     print(f"Successfully saved OHLC time series for {symbol}")
 
 #######################################################################################################################
@@ -181,9 +181,9 @@ if __name__ == "__main__":
     span        = [10, 30, 50, 100, 200, 500, 1000, 2000, 5000, 10_000, 15_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 100, 500]    # Different windows over which we compute statistics
 
-    symbols      = ["GBP_USD", "EUR_CHF", "USD_CHF", "AUD_USD"]                # Symbol over which we gather the data      'BTCUSDT'
+    symbols      = ["GBP_USD", "EUR_USD"]                # Symbol over which we gather the data      'BTCUSDT'
     market      = "forex"                   # Market from which we gather data          'crypto'
-    interval    = ['1d']        # Time interval to make the candlestick
+    interval    = ['1h']        # Time interval to make the candlestick
 
     span        = [10, 30, 90, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 50, 100]    # Different windows over which we compute statistics

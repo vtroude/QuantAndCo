@@ -57,12 +57,12 @@ def fetch_candlesticks(client: oandapyV20.API, symbol: str, interval: str, start
 
         # Set the contenet of the DataFrame to be float
         df    = df[['Open', 'High', 'Low', 'Close', 'Volume']].astype(float)
-
-        print('Data was successfully downloaded.')
         
         # Return candlestick
+        print('Data was successfully downloaded.')
         return df
-    except:
+    except Exception as e:
+        print(f"No data was found. Error: {e}")
         return None
 
 #######################################################################################################################
