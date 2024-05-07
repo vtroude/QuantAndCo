@@ -37,7 +37,7 @@ def get_ols_results(x, y):
 
     return alpha, beta, resid
 
-def pairs_trading_signals(df, asset_y, asset_x, alpha, beta, resids, entry_zScore, exit_zScore):
+def pairs_trading_signals(df, asset_y, asset_x, alpha, beta, resids, long_thres, short_thres):
 
     """
     Hedge ratio and residuals are estimated on a train data. Then, signals are generated on a subsequent test data.
@@ -51,22 +51,24 @@ def pairs_trading_signals(df, asset_y, asset_x, alpha, beta, resids, entry_zScor
     resid_mean, resid_std = np.mean(resids), np.std(resids)
     resid_zscore = (resid_vali - resid_mean) / resid_std
     df["z_score"] = resid_zscore
-    df["signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
-    df["exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
-    df["Close"] = df[asset_y] - beta * df[asset_x]
+    df["signal"] = (resid_zscore <= long_thres) *1 + (resid_zscore >= short_thres) * -1
 
     return df
 
 
 
 
-def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_period, dynamic_regression=False,
+def Pairs_Trading(df, asset_x, asset_y, long_thres, short_thres,
+                end_train_period, dynamic_regression=False,
                   window=1000):
     """
     The strategy is trained with a train set and a validation set.
     The first hedge ratio is estimated on the train set.
     Then, it is dynamically adjusted every "window" bar by adding the new data, and used for the subsequent "window" bars.
+
     """
+
+
     train_index = df.reset_index().loc[df.index>=end_train_period].index[0]
     y = df[[asset_y]]
     x = df[[asset_x]]
@@ -81,7 +83,6 @@ def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_per
     #Check_Mean_Reversion(y_train[["residuals"]])
 
     df['signal'] = 0
-    df['exit_signal'] = 0
     df['z_score'] = np.nan
     df['hedge_ratio'] = np.nan
 
@@ -96,11 +97,15 @@ def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_per
         resid_vali = y_vali[asset_y] - y_vali["y_hat"]
         resid_mean, resid_std = resid_means[-1], resid_stds[-1]
         resid_zscore = (resid_vali - resid_mean) / resid_std
+        df_vali["spread"] = resid_vali
         df_vali["hedge_ratio"] = beta
         df_vali["z_score"] = resid_zscore
-        df_vali["signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
-        df_vali["exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
+        ###### LONG entry if z_score below negative entry threshold (1) -> LONG exit if z_score above negative entry threshold (-1)
+        #df_vali["signal"] = (resid_zscore <= long_entry) *1 + (resid_zscore >= short_entry) * -1
+        #df_vali["exit_signal"] = (resid_zscore >= long_exit) * -1 + (resid_zscore <= short_exit) * 1
+        df_vali["signal"] = (resid_zscore <= long_thres) *1 + (resid_zscore >= short_thres) * -1
         df_vali["Portfolio"] = df_vali[asset_y] - beta * df_vali[asset_x]
+
     
     else:
         n_windows = int( len(y_vali) / window )
@@ -118,10 +123,10 @@ def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_per
             resid_vali = sub_y_vali[asset_y] - sub_y_vali["y_hat"]
             resid_mean, resid_std = resid_means[-1], resid_stds[-1]
             resid_zscore = (resid_vali - resid_mean) / resid_std
+            df_vali.loc[df_vali.index[w_init:w_last], "spread"] = resid_vali
             df_vali.loc[df_vali.index[w_init:w_last], "hedge_ratio"] = beta
             df_vali.loc[df_vali.index[w_init:w_last], "z_score"] = resid_zscore
-            df_vali.loc[df_vali.index[w_init:w_last], "signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
-            df_vali.loc[df_vali.index[w_init:w_last], "exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
+            df_vali.loc[df_vali.index[w_init:w_last], "signal"] = (resid_zscore <= long_thres) *1 + (resid_zscore >= short_thres) * -1
             df_vali.loc[df_vali.index[w_init:w_last], "Portfolio"] = df_vali.loc[df_vali.index[w_init:w_last], asset_y] - beta * df_vali.loc[df_vali.index[w_init:w_last], asset_x]
 
             new_x_train = x.iloc[:w_last]
@@ -142,13 +147,13 @@ def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_per
             resid_vali = sub_y_vali[asset_y] - sub_y_vali["y_hat"]
             resid_mean, resid_std = resid_means[-1], resid_stds[-1]
             resid_zscore = (resid_vali - resid_mean) / resid_std
+            df_vali.loc[df_vali.index[w_last:], "spread"] = resid_vali
             df_vali.loc[df_vali.index[w_last:], "hedge_ratio"] = beta
             df_vali.loc[df_vali.index[w_last:], "z_score"] = resid_zscore
-            df_vali.loc[df_vali.index[w_last:], "signal"] = (resid_zscore <= - entry_zScore) *1 + (resid_zscore >= entry_zScore) * -1
-            df_vali.loc[df_vali.index[w_last:], "exit_signal"] = (resid_zscore >= - exit_zScore) * -1 + (resid_zscore <= exit_zScore) * 1
+            df_vali.loc[df_vali.index[w_last:], "signal"] = (resid_zscore <= long_thres) *1 + (resid_zscore >= short_thres) * -1
             df_vali.loc[df_vali.index[w_last:], "Portfolio"] = df_vali.loc[df_vali.index[w_last:], asset_y] - beta * df_vali.loc[df_vali.index[w_last:], asset_x]
 
-    df_ = df_vali[[asset_y, asset_x, "hedge_ratio", "Portfolio", "z_score", "signal", "exit_signal"]]
+    df_ = df_vali[[asset_y, asset_x, "spread", "hedge_ratio", "Portfolio", "z_score", "signal"]]
 
     return df_
 
@@ -171,24 +176,34 @@ def Pairs_Trading(df, asset_x, asset_y, entry_zScore, exit_zScore, end_train_per
     #return df_
 
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
 
-    y = pd.read_csv("Data/forex/EUR_USD/1m/OHLC/1563535876_1713535876.csv")
-    x = pd.read_csv("Data/forex/GBP_USD/1m/OHLC/1563535876_1713535876.csv")
-    y["timestamp"] = pd.to_datetime(y["close_time"])
-    y.set_index("timestamp", inplace=True)
-    y = y[["Close"]].rename(columns={"Close": "EUR_USD"})
-    x["timestamp"] = pd.to_datetime(x["close_time"])
-    x.set_index("timestamp", inplace=True)
-    x = x[["Close"]].rename(columns={"Close": "GBP_USD"})
-    df = pd.merge(x, y, right_index=True, left_index=True, how="inner")
+    #y = pd.read_csv("Data/forex/EUR_USD/1m/OHLC/1563535876_1713535876.csv")
+    #x = pd.read_csv("Data/forex/GBP_USD/1m/OHLC/1563535876_1713535876.csv")
+    #y["timestamp"] = pd.to_datetime(y["close_time"])
+    #y.set_index("timestamp", inplace=True)
+    #y = y[["Close"]].rename(columns={"Close": "EUR_USD"})
+    #x["timestamp"] = pd.to_datetime(x["close_time"])
+    #x.set_index("timestamp", inplace=True)
+    #x = x[["Close"]].rename(columns={"Close": "GBP_USD"})
+    #df = pd.merge(x, y, right_index=True, left_index=True, how="inner")
+    #df.to_csv('Data/Backtest/Combined_EURUSD_GBPUSD.csv')
 
-    df = df.loc[df.index<='2023-01-01']
+    df = pd.read_csv('Data/Backtest/Combined_EURUSD_GBPUSD.csv')
+    df.set_index("timestamp", inplace=True)
+    #print(df.head())
 
-    pairs_trading = Pairs_Trading(df, "EUR_USD", "GBP_USD", entry_zScore=1, exit_zScore=0.5, end_train_period="2022-01-01")
+
+    pairs_trading = Pairs_Trading(df, "EUR_USD", "GBP_USD", long_thres=-0.5, short_thres=0.5, end_train_period="2022-01-01")
+
+    #print(pairs_trading.head())
+
+    #print(pairs_trading.loc[(pairs_trading.z_score <= -0.5)])
+    #print(pairs_trading.loc[pairs_trading.signal != pairs_trading.exit_signal])
     
-    print(pairs_trading.hedge_ratio.std())
+    #print(pairs_trading.hedge_ratio.std())
     
-    pairs_trading.to_csv('Data/Backtest/PairsTradingStrategy-EUR_USD-GBP_USD.csv')
+    #pairs_trading.to_csv('Data/Backtest/PairsTradingStrategy-EUR_USD-GBP_USD.csv')
     #print(pairs_trading.loc[pairs_trading.signal==1])
     #resid = PairsTrading(df.EUR_USD, df.GBP_USD)
     #print(resid)

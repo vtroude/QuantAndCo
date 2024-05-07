@@ -11,7 +11,7 @@ class Backtest:
                 interval: str, start_date: str=None, end_date: str=None,
                 price_column: str='Close', initial_wealth: float=1.0,
                 leverage: float=1.0, fees: float=0.0, slippage: float=0.0, 
-                take_profit: float=1000, stop_loss: float=-1000):
+                take_profit: float=1000, stop_loss: float=-1000, check_data=False):
         """
         This function takes as input a strategy dataframe which contains the price 
         of the asset and signals of the strategy, and returns the wealth of the portfolio.
@@ -60,15 +60,16 @@ class Backtest:
         log_file = f"logs-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}.log"
         self.logger = set_logs(log_file)
 
-        self.data_checks()
+        if check_data:
+            self.data_checks()
 
         if not os.path.exists("Data/Backtest"):
             os.mkdir("Data/Backtest")
 
 
-        self.backtest_df = self.Backtest_strategy()
-        self.metrics = self.backtest_metrics()
-        self.plot_equity_curve()
+        #self.backtest_df = self.Backtest_strategy()
+        #self.metrics = self.backtest_metrics()
+        #self.plot_equity_curve()
 
     
     def update_wealth(self, previous_wealth, buy_and_hold_return, position_change):
@@ -220,26 +221,106 @@ class Backtest:
 
         return self.signal_df
     
-    def backtest_metrics(self, return_metric=None):
+    def Vectorized_BT_PairsTrading(self, asset_y, asset_x):
+        """
+        Executes a vectorized backtesting of a pairs trading strategy on two assets. 
+        The function calculates the portfolio returns considering the hedge ratio between the two assets,
+        adjusts for trading fees based on position changes, and computes the wealth trajectory over time.
 
-        wealth_df = self.backtest_df['Wealth']
+        Parameters:
+        - asset_y (str): The column name in the DataFrame for the first asset's prices.
+        - asset_x (str): The column name in the DataFrame for the second asset's prices.
+
+        Steps:
+        1. Copy the signal DataFrame to preserve the original data.
+        2. Shift the signals to align with trading execution (i.e., trades happen after signals).
+        3. Calculate position changes to determine when trades occur.
+        4. Compute the percentage change (returns) for both assets.
+        5. Calculate the portfolio returns by considering the position (long or short) and the hedge ratio.
+        6. Calculate fees based on position changes and apply leverage to these fees.
+        7. Adjust the portfolio returns to account for the fees.
+        8. Compute the cumulative growth factors, considering the leverage and adjusted returns.
+        9. Calculate the wealth at each time point based on the initial wealth and cumulative growth factors.
+        10. Set the initial wealth explicitly for the first data point.
+
+        Outputs:
+        - df (pandas DataFrame): A DataFrame containing the original signals, calculated positions, returns,
+        fees, adjusted returns, and the wealth trajectory over time.
+
+        Returns:
+        - pandas DataFrame: The DataFrame with additional columns for position, position_change,
+        asset returns, portfolio returns, fees, adjusted returns, and wealth.
+
+        Notes:
+        - Ensure that `self.signal_df` contains the necessary columns referenced by `asset_y` and `asset_x`,
+        and it must include a 'signal' column for trading signals.
+        - `self.leverage`, `self.fees`, and `self.initial_wealth` should be predefined attributes of the class.
+        """
+
+        df = self.signal_df.copy()
+        df["position"] = df["signal"].shift(1)
+        df.loc[df.index[0], "position"] = 0
+        df["position_change"] = abs(df["position"].diff())
+        df[f"{asset_y}_return"] = df[asset_y].pct_change()
+        df[f'{asset_x}_return'] = df[asset_x].pct_change()
+
+        df["Portfolio_return"] = df["position"] * (df[f"{asset_y}_return"] - df["hedge_ratio"] * df[f"{asset_x}_return"])
+
+        # Calculate growth factors considering leverage and the adjusted returns
+        growth_factors = 1 + df["Portfolio_return"] * self.leverage
+
+        # Calculate cumulative wealth
+        df["Wealth"] = np.cumprod(growth_factors) * self.initial_wealth
+
+        df["fees"] = (self.leverage * df["position_change"] * self.fees)
+        df["Wealth"] = (1 - df['fees']) * df["Wealth"]
+
+        df.loc[df.index[0], "Wealth"] = self.initial_wealth  # Set initial wealth at the first index
+
+        return df
+    
+    def calculate_perf(self, backtest_df):
+        wealth_df = backtest_df["Wealth"]
+
+        return (wealth_df.iloc[-1] / wealth_df.iloc[0]) - 1
+        
+    
+    def backtest_metrics(self, backtest_df, return_metric=None):
+
+        wealth_df = backtest_df["Wealth"]
+
+
         check_column_index(wealth_df, "timestamp")
         n_trading_hours, n_trading_days = market_trading_rules(self.market)
         n_bars, n_years = check_expected_bars(wealth_df, self.interval, n_trading_hours, n_trading_days)
 
         CAGR = (wealth_df.iloc[-1] / wealth_df.iloc[0]) ** (1/n_years) - 1
-        total_perf = (wealth_df.iloc[-1] / wealth_df.iloc[0]) - 1
+        total_perf = self.calculate_perf(backtest_df)
         avg_return = wealth_df.pct_change().dropna().mean()
         avg_ann_return = avg_return * n_bars / n_years
         volatility = wealth_df.pct_change().dropna().std()
         ann_vol = volatility * np.sqrt( n_bars / n_years )
         sharpe = avg_ann_return / ann_vol
+        start = wealth_df.index[0]
+        end = wealth_df.index[-1]
+        initial_value = wealth_df.iloc[0]
+        period = end - start
+        min_value = np.min(wealth_df)
+        max_value = np.max(wealth_df)
+        end_value = wealth_df.iloc[-1]
+        nb_orders = len(backtest_df.loc[backtest_df.position_change != 0])
+        trade_frequency = nb_orders / len(backtest_df)
+        fees_df = backtest_df.loc[backtest_df.position_change != 0]
+        total_fees = (fees_df['fees'] * fees_df['Wealth']).sum()
+        
 
 
-        metrics = [round(total_perf*100, 2), round(CAGR*100, 2), round(100*avg_ann_return, 2), round(100*ann_vol, 2), round(sharpe, 2)]
+        metrics = [start, end, period, initial_value, min_value, max_value, end_value, round(total_perf*100, 2), round(CAGR*100, 2), 
+                   round(100*avg_ann_return, 2), round(100*ann_vol, 2), round(sharpe, 2), nb_orders, round(trade_frequency*100, 2),
+                   self.leverage, total_fees, total_fees/initial_value]
         df_metrics = pd.DataFrame(metrics).T
-        df_metrics.columns = ['Total Performance [%]', 'CAGR [%]', 'Avg. Return (Ann.) [%]', 'Volatility (Ann.) [%]', 'Sharpe Ratio (Ann.)']
-        df_metrics.index.name = 'Portfolio Metrics'
+        df_metrics.columns = ['Start', 'End', 'Period', 'Start Value', 'Min Value', 'Max Value', 'End Value', 'Total Performance [%]', 'CAGR [%]', 'Avg. Return (Ann.) [%]', 'Volatility (Ann.) [%]', 'Sharpe Ratio (Ann.)',
+                              'Orders', 'Trade Frequency [%]', 'Leverage', 'Total Fees [$]', 'Total Fees [%]']
         df_metrics.to_csv(f"Data/Backtest/{self.market}-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-backtest_metrics.csv")
         if return_metric:
             if return_metric == 'total_perf':
@@ -255,7 +336,7 @@ class Backtest:
             else:
                 raise ValueError(f"Metric {return_metric} not found")
             
-        return df_metrics
+        return df_metrics.T
 
     def plot_equity_curve(self):
         """
