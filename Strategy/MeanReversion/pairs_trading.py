@@ -2,6 +2,7 @@ from Research.statistical_tests import adf_test, OLS_reg, get_half_life, Check_M
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from pyfinance.ols import PandasRollingOLS
 
 def PairsTrading(x, y):
 
@@ -55,6 +56,68 @@ def pairs_trading_signals(df, asset_y, asset_x, alpha, beta, resids, long_thres,
 
     return df
 
+
+def dynamicOLS(df, asset_x, asset_y, window):
+    """
+
+    """
+    n_windows = int( len(df) / window )
+
+    alphas, betas, resids = [], [], []
+
+    x, y = df[[asset_x]], df[[asset_y]]
+
+    for t in range(n_windows):
+        w_init = t * window
+        w_last = (t+1) * window
+        sub_y_vali = y.iloc[w_init:w_last]
+        sub_x_vali = x.iloc[w_init:w_last]
+
+        new_x_train = x.iloc[:w_last]
+        new_y_train = y.iloc[:w_last]
+        new_alpha, new_beta, new_resid = get_ols_results(new_x_train, new_y_train)
+        alphas.append(new_alpha)
+        betas.append(new_beta)
+        resids.append(new_resid)
+        if t == 0:
+            continue
+
+        alpha = alphas[-2]
+        beta = betas[-2]
+        resid = resids[-2]
+
+        sub_y_vali["y_hat"] = alpha + beta * sub_x_vali
+        resid_vali = sub_y_vali[asset_y] - sub_y_vali["y_hat"]
+        resid_mean, resid_std = np.mean(resid), np.std(resid)
+        resid_zscore = (resid_vali - resid_mean) / resid_std
+
+        df.loc[df.index[w_init:w_last], "spread"] = resid_vali
+        df.loc[df.index[w_init:w_last], "hedge_ratio"] = beta
+        df.loc[df.index[w_init:w_last], "z_score"] = resid_zscore
+
+        return df
+    
+
+def dynamicOLS_PairsTrading(df, asset_x, asset_y, window):
+
+    y = df[asset_y]
+    x = df[asset_x]
+    model = PandasRollingOLS(y=y, x=x, window=window)
+    #In the below merge, we are shifting the regression results by 1 period, such that at each time, the OLS 
+    #parameters are estimated based on the previous "window" bars
+    df = pd.merge(df, model.beta.rename(columns={'feature1': 'hedge_ratio'}).shift(1), right_index=True, left_index=True, how='left')
+    df = pd.merge(df, pd.DataFrame(model.alpha).shift(1), right_index=True, left_index=True, how='left')
+    df['y_hat'] = df['intercept'] + df['hedge_ratio'] * df[asset_x]
+    df['residuals'] = df[asset_y] - df["y_hat"]
+    df["resid_mean"] = df.residuals.rolling(window).mean()
+    df["resid_std"] = df.residuals.rolling(window).std()
+    df['z_score'] = ( df["residuals"] - df["resid_mean"] ) / df["resid_std"]
+
+    return df
+
+def generate_signals(df, long_thres, short_thres):
+    df["signal"] = (df["z_score"] <= long_thres) * 1 + (df["z_score"] >= short_thres) * -1
+    return df
 
 
 
@@ -153,7 +216,7 @@ def Pairs_Trading(df, asset_x, asset_y, long_thres, short_thres,
             df_vali.loc[df_vali.index[w_last:], "signal"] = (resid_zscore <= long_thres) *1 + (resid_zscore >= short_thres) * -1
             df_vali.loc[df_vali.index[w_last:], "Portfolio"] = df_vali.loc[df_vali.index[w_last:], asset_y] - beta * df_vali.loc[df_vali.index[w_last:], asset_x]
 
-    df_ = df_vali[[asset_y, asset_x, "spread", "hedge_ratio", "Portfolio", "z_score", "signal"]]
+    df_ = df_vali[[asset_y, asset_x, "spread", "hedge_ratio", "z_score", "signal"]]
 
     return df_
 
@@ -194,9 +257,9 @@ if __name__ == "__main__":
     #print(df.head())
 
 
-    pairs_trading = Pairs_Trading(df, "EUR_USD", "GBP_USD", long_thres=-0.5, short_thres=0.5, end_train_period="2022-01-01")
+    ols = dynamicOLS(df, "GBP_USD", "EUR_USD", 1000)
 
-    #print(pairs_trading.head())
+    ols.to_csv("Data/Backtest/dynamicOLS.csv")
 
     #print(pairs_trading.loc[(pairs_trading.z_score <= -0.5)])
     #print(pairs_trading.loc[pairs_trading.signal != pairs_trading.exit_signal])

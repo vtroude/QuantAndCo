@@ -46,3 +46,4 @@ statsmodels
 arch
 optuna
 hyperopt
+pyfinance

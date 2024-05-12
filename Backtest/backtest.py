@@ -90,6 +90,12 @@ class Backtest:
 
     def calculate_trade_return(self, entry_price, exit_price):
         return self.position * (exit_price/entry_price - 1) * self.leverage * (1 - self.slippage - self.fees)
+
+    def calculate_pairs_trade_return(self, hedge_ratio, entry_price_y, exit_price_y, entry_price_x, exit_price_x):
+        y_return = exit_price_y / entry_price_y - 1
+        x_return = exit_price_x / entry_price_x - 1
+        return self.position * (y_return - hedge_ratio * x_return) * self.leverage * (1 - self.slippage - self.fees)
+
     
     def update_unrealized_pnl(self, previous_pnl, wealth_change):
         return self.position * ( (1+wealth_change) * (1+previous_pnl) - 1 )
@@ -220,6 +226,114 @@ class Backtest:
         self.signal_df.to_csv(f"Data/Backtest/{self.market}-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-Backtest_DF.csv")
 
         return self.signal_df
+
+    def Backtest_PairsTrading_loop(self, asset_x, asset_y):
+
+        i0              = 1     # Start at index 1
+        self.signal_df["Wealth"] = self.initial_wealth    # Initialize Wealth / Portfolio value
+        self.signal_df['position'] = self.position 
+        self.signal_df["Realized_Return"] = 0.0 #Updated whenever a trade is closed, otherwise set to 0.
+        self.signal_df['Unrealized_PnL'] = 0.0
+        self.signal_df["Stop Loss"] = False
+        self.signal_df["Take Profit"] = False
+        self.signal_df[f"{asset_x}_return"] = self.signal_df[asset_x].pct_change()
+        self.signal_df[f"{asset_y}_return"] = self.signal_df[asset_y].pct_change()
+        self.signal_df[self.buy_hold_column] = self.signal_df[f"{asset_y}_return"] - self.signal_df["hedge_ratio"] * self.signal_df[f"{asset_x}_return"].pct_change()
+        # Loop over price time-series
+        self.logger.debug(f'Initializing backtesting...')
+        while i0 < len(self.signal_df) - 1:
+
+            bar = self.signal_df.index[i0]
+            next_bar = self.signal_df.index[i0+1]
+            wealth = self.signal_df.loc[self.signal_df.index[i0], "Wealth"]
+            buy_and_hold_return = self.signal_df.loc[self.signal_df.index[i0+1], self.buy_hold_column] #buy and hold return of next bar, because it is only used for wealth calculated which is updated a next bar 
+            entry_signal = self.signal_df.loc[self.signal_df.index[i0], "signal"]
+            #exit_signal = self.signal_df.loc[self.signal_df.index[i0], "exit_signal"]
+            position_change = 0
+            unrealized_pnl = self.signal_df.loc[self.signal_df.index[i0], "Unrealized_PnL"]
+            hedge_ratio = self.signal_df.loc[self.signal_df.index[i0], "hedge_ratio"]
+
+            if self.position == 0:
+                self.position  = entry_signal 
+                if self.position != 0:
+                    position_change = 1
+                    self.logger.debug('='*50)
+                    entry_price_y = self.signal_df.iloc[i0+1][asset_y] #When entry signal is observed at i0, trade is entered at i0+1
+                    entry_price_x = self.signal_df.iloc[i0+1][asset_x]
+                    if self.position == 1:
+                        direction_y, direction_x = 'Long', 'Short'
+                    else:
+                        direction_y, direction_x = 'Short', 'Long'
+                    self.logger.debug(f'NEW {direction_y} signal detected on {bar}')
+                    self.logger.debug(f'{direction_y} trade entered for {asset_y} on {next_bar} at ${entry_price_y}')
+                    self.logger.debug(f'{direction_x} trade entered for {asset_x} on {next_bar} at ${entry_price_x}')
+
+
+            else:
+                current_price_y = self.signal_df.loc[self.signal_df.index[i0], asset_y]
+                current_price_x = self.signal_df.loc[self.signal_df.index[i0], asset_x]
+                y_return = current_price_y / entry_price_y - 1
+                x_return = current_price_x / entry_price_x - 1
+                unrealized_pnl = self.position * (y_return - hedge_ratio * x_return) * self.leverage 
+
+                exit_conditions = {
+                'TP_rule': (unrealized_pnl >= self.take_profit, "Take Profit Rule"),
+                'SL_rule': (unrealized_pnl <= self.stop_loss, "Stop Loss Rule"),
+                'signal_rule': ((entry_signal != self.position) and (entry_signal != 0), "Change of Signal")
+                }
+                    
+                if any(condition for condition, _ in exit_conditions.values()): #We exit the position as soon as we have a signal in the opposite direction. (OR TAKE PROFIT, TAKE LOSS)
+                    self.logger.debug(f'CLOSING {direction_y} position on {next_bar}')
+                    position_change = 1
+                    true_conditions = [description for condition, description in exit_conditions.values() if condition]
+                    self.logger.debug(f'Reason: {true_conditions}')
+                    exit_price_y = self.signal_df.iloc[i0+1][asset_y] #When exit signal is observed at i0, trade is exited at i0+1
+                    exit_price_x = self.signal_df.iloc[i0+1][asset_x]
+                    trade_return = self.calculate_pairs_trade_return(hedge_ratio, entry_price_y, exit_price_y, entry_price_x, exit_price_x)
+                    self.logger.debug(f'Trade exited from {asset_y} at exit price: {exit_price_y}')
+                    self.logger.debug(f'Trade exited from {asset_x} at exit price: {exit_price_x}')
+                    self.logger.debug(f'Return of trade with leverage {self.leverage}: {trade_return}')
+                    self.logger.debug('='*50)
+                    self.logger.debug('\n')
+                    self.signal_df.loc[self.signal_df.index[i0+1], "Realized_Return"] = trade_return
+                    self.position = 0
+            
+
+            self.signal_df.loc[self.signal_df.index[i0], "Unrealized_PnL"] = unrealized_pnl
+
+            self.signal_df.loc[self.signal_df.index[i0], "Take Profit"] = True if unrealized_pnl>=self.take_profit else False
+            self.signal_df.loc[self.signal_df.index[i0], "Stop Loss"] = True if unrealized_pnl<=self.stop_loss else False
+            self.signal_df.loc[self.signal_df.index[i0+1], "position"] = self.position #We now assume position is immediately updated once signal is observed, however we apply negative slippage to the execution price
+            updated_wealth = self.update_wealth(wealth, buy_and_hold_return, position_change)
+            #self.logger.debug(f'Wealth: {updated_wealth}')
+            self.signal_df.loc[self.signal_df.index[i0+1], "Wealth"] = updated_wealth #wealth is updated one bar after the position is entered
+
+            if updated_wealth <= 0.0001:
+                self.logger.debug('Backtested ended before end date. Reason: Wealth dropped to zero.')
+                return self.signal_df
+
+            
+            i0+=1
+        
+        #if self.position != 0: #If a position is still open at last bar, close it
+        #    exit_price = self.signal_df.iloc[i0][self.price_column]
+        #    trade_return = self.calculate_trade_return(entry_price, exit_price)
+        #    self.logger.debug(f'CLOSING {direction} position on {bar}')
+        #    self.logger.debug('Reason: End of backtesting, closing all positions.')
+        #    self.logger.debug(f'Trade exited at exit price: {exit_price}')
+        #    self.logger.debug(f'Return of trade with leverage {self.leverage}: {trade_return}')
+        #    self.position = 0
+        #    self.signal_df.loc[self.signal_df.index[i0], "Realized_Return"] = trade_return
+        #    self.signal_df.loc[self.signal_df.index[i0], "position"] = self.position
+        #    final_wealth = self.update_wealth(wealth, buy_and_hold_return, position_change=1)
+        #    self.signal_df.loc[self.signal_df.index[i0], "Wealth"] = final_wealth
+        #    self.logger.debug(f'Final wealth: {final_wealth}')
+        
+        self.logger.debug(f'Backtesting completed.')
+        
+        self.signal_df.to_csv(f"Data/Backtest/{self.market}-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-Backtest_DF.csv")
+
+        return self.signal_df
     
     def Vectorized_BT_PairsTrading(self, asset_y, asset_x):
         """
@@ -311,7 +425,10 @@ class Backtest:
         nb_orders = len(backtest_df.loc[backtest_df.position_change != 0])
         trade_frequency = nb_orders / len(backtest_df)
         fees_df = backtest_df.loc[backtest_df.position_change != 0]
-        total_fees = (fees_df['fees'] * fees_df['Wealth']).sum()
+        if 'fees' not in backtest_df.columns:
+            total_fees = 0
+        else:
+            total_fees = (fees_df['fees'] * fees_df['Wealth']).sum()
         
 
 
