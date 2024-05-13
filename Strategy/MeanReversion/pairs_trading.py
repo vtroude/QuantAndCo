@@ -241,25 +241,25 @@ def Pairs_Trading(df, asset_x, asset_y, long_thres, short_thres,
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    #y = pd.read_csv("Data/forex/EUR_USD/1m/OHLC/1563535876_1713535876.csv")
-    #x = pd.read_csv("Data/forex/GBP_USD/1m/OHLC/1563535876_1713535876.csv")
-    #y["timestamp"] = pd.to_datetime(y["close_time"])
-    #y.set_index("timestamp", inplace=True)
-    #y = y[["Close"]].rename(columns={"Close": "EUR_USD"})
-    #x["timestamp"] = pd.to_datetime(x["close_time"])
-    #x.set_index("timestamp", inplace=True)
-    #x = x[["Close"]].rename(columns={"Close": "GBP_USD"})
-    #df = pd.merge(x, y, right_index=True, left_index=True, how="inner")
-    #df.to_csv('Data/Backtest/Combined_EURUSD_GBPUSD.csv')
+    y = pd.read_csv("Data/forex/EUR_USD/1m/OHLC/1563535876_1713535876.csv")
+    x = pd.read_csv("Data/forex/GBP_USD/1m/OHLC/1563535876_1713535876.csv")
+    y["timestamp"] = pd.to_datetime(y["close_time"])
+    y.set_index("timestamp", inplace=True)
+    y = y[["Close"]].rename(columns={"Close": "EUR_USD"})
+    x["timestamp"] = pd.to_datetime(x["close_time"])
+    x.set_index("timestamp", inplace=True)
+    x = x[["Close"]].rename(columns={"Close": "GBP_USD"})
+    df = pd.merge(x, y, right_index=True, left_index=True, how="inner")
+    df.to_csv('Data/Backtest/Combined_EURUSD_GBPUSD.csv')
 
-    df = pd.read_csv('Data/Backtest/Combined_EURUSD_GBPUSD.csv')
-    df.set_index("timestamp", inplace=True)
+    #df = pd.read_csv('Data/Backtest/Combined_EURUSD_GBPUSD.csv')
+    #df.set_index("timestamp", inplace=True)
     #print(df.head())
 
 
-    ols = dynamicOLS(df, "GBP_USD", "EUR_USD", 1000)
+    #ols = dynamicOLS(df, "GBP_USD", "EUR_USD", 1000)
 
-    ols.to_csv("Data/Backtest/dynamicOLS.csv")
+    #ols.to_csv("Data/Backtest/dynamicOLS.csv")
 
     #print(pairs_trading.loc[(pairs_trading.z_score <= -0.5)])
     #print(pairs_trading.loc[pairs_trading.signal != pairs_trading.exit_signal])

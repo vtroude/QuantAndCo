@@ -381,7 +381,7 @@ class Backtest:
         df["Portfolio_return"] = df["position"] * (df[f"{asset_y}_return"] - df["hedge_ratio"] * df[f"{asset_x}_return"])
 
         # Calculate growth factors considering leverage and the adjusted returns
-        growth_factors = 1 + df["Portfolio_return"] * self.leverage
+        growth_factors = 1 + df["Portfolio_return"].shift(1) * self.leverage
 
         # Calculate cumulative wealth
         df["Wealth"] = np.cumprod(growth_factors) * self.initial_wealth
@@ -393,15 +393,15 @@ class Backtest:
 
         return df
     
-    def calculate_perf(self, backtest_df):
-        wealth_df = backtest_df["Wealth"]
+    def calculate_perf(self, wealth_df):
 
         return (wealth_df.iloc[-1] / wealth_df.iloc[0]) - 1
         
     
-    def backtest_metrics(self, backtest_df, return_metric=None):
+    def backtest_metrics(self, backtest_df, fee_column='fees', 
+                         return_metric=None):
 
-        wealth_df = backtest_df["Wealth"]
+        wealth_df = backtest_df["Wealth"].dropna()
 
 
         check_column_index(wealth_df, "timestamp")
@@ -409,7 +409,7 @@ class Backtest:
         n_bars, n_years = check_expected_bars(wealth_df, self.interval, n_trading_hours, n_trading_days)
 
         CAGR = (wealth_df.iloc[-1] / wealth_df.iloc[0]) ** (1/n_years) - 1
-        total_perf = self.calculate_perf(backtest_df)
+        total_perf = self.calculate_perf(wealth_df)
         avg_return = wealth_df.pct_change().dropna().mean()
         avg_ann_return = avg_return * n_bars / n_years
         volatility = wealth_df.pct_change().dropna().std()
@@ -422,13 +422,11 @@ class Backtest:
         min_value = np.min(wealth_df)
         max_value = np.max(wealth_df)
         end_value = wealth_df.iloc[-1]
-        nb_orders = len(backtest_df.loc[backtest_df.position_change != 0])
+        backtest_df['signal_change'] = backtest_df.signal.diff()
+        nb_orders = len(backtest_df.loc[backtest_df['signal_change'] != 0])
         trade_frequency = nb_orders / len(backtest_df)
-        fees_df = backtest_df.loc[backtest_df.position_change != 0]
-        if 'fees' not in backtest_df.columns:
-            total_fees = 0
-        else:
-            total_fees = (fees_df['fees'] * fees_df['Wealth']).sum()
+        total_fees = backtest_df[fee_column].sum()
+
         
 
 
@@ -484,3 +482,76 @@ class Backtest:
         file_name = f'Data/Backtest/Figure/{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-Equity_Curve.png'
 
         fig.savefig(file_name)
+
+
+    def backtest_pairs_trading(self, asset_x, asset_y):
+        """
+        Vectorized backtesting of a pairs trading strategy.
+
+        Parameters:
+        - df (pd.DataFrame): Input DataFrame containing asset_x and asset_y as columns, 'hedge_ratio', 'signal'
+        - leverage (float or pd.Series): The leverage multiplier to scale the positions and costs.
+
+        Adds a 'Wealth' column to the DataFrame which accumulates the wealth of the strategy over time.
+
+        The strategy:
+        - 'signal' = -1: Short the pair, short asset_y and long asset_x
+        - 'signal' = 1: Long the pair, long asset_y and short asset_x
+        - 'signal' = 0: No position
+        
+        We use the 'hedge_ratio' to balance the position sizes between asset_x and asset_y.
+        Transaction costs are proportional to the leverage used.
+        """
+
+        df = self.signal_df.copy()
+
+        # Avoid look-ahead bias by shifting the signal forward by one period
+        # Signals effectively become actionable the next bar
+        df['signal'] = df['signal'].shift(1).fillna(0)
+        
+        # Calculate positions for asset_x and asset_y based on signal and hedge ratio
+        df[f'position_{asset_y}'] = df['signal'] * self.leverage  # Position in asset_y directly follows the signal
+        df[f'position_{asset_x}'] = -df['signal'] * df['hedge_ratio'] * self.leverage  # Position in asset_x is opposite and scaled by hedge ratio
+
+        return_x, return_y = f'return_{asset_x}', f'return_{asset_y}'
+
+        # Calculate daily returns for each asset
+        df[return_x] = df[asset_x].pct_change().fillna(0)
+        df[return_y] = df[asset_y].pct_change().fillna(0)
+
+        df["net_position_change"] = df[[f'position_{asset_x}', f'position_{asset_y}']].diff().abs().sum(axis=1)
+
+        # Calculate portfolio changes from returns
+        df['portfolio_change'] = df[f'position_{asset_x}'] * df[return_x] + df[f'position_{asset_y}'] * df[return_y]
+
+ 
+        # Adjust portfolio change by transaction costs
+        #df['net_portfolio_change'] = df['portfolio_change'] - df['transaction_costs']
+
+        
+        # Calculate cumulative wealth starting from zero
+        df['Wealth'] = (1+df['portfolio_change'] - self.fees * df["net_position_change"]).cumprod().shift(1) * self.initial_wealth
+        df["fees"] = self.fees * df["Wealth"].shift(1) * df["net_position_change"].shift(1)
+
+
+        #df.loc[df.index[0], "Wealth"] = self.initial_wealth
+
+        # Ensure wealth never goes negative
+        #df['Wealth'] = df['Wealth'].clip(lower=0)
+
+        #schema = [asset_y, asset_x, 'hedge_ratio','z_score', 'signal',
+        #          'net_position_change', 'transaction_costs', 'net_portfolio_change', 'Wealth']
+
+        #return df[schema]
+        return df
+
+    # Example usage:
+    # df = pd.DataFrame({
+    #     'price_x': np.random.rand(100) * 100,
+    #     'price_y': np.random.rand(100) * 100,
+    #     'hedge_ratio': np.random.rand(100) * 2,
+    #     'signal': np.random.choice([-1, 0, 1], size=100)
+    # })
+    # result = backtest_pairs_trading(df)
+    # print(result.head())
+
