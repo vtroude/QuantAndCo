@@ -20,7 +20,7 @@ def get_random_periods(df, N, num_bars):
     return [(start, start + num_bars) for start in random_starts]
 
 # Pre-select random periods before optimization
-num_periods = 10 # Define how many periods you want to test each parameter set against
+num_periods = 100 # Define how many periods you want to test each parameter set against
 random_periods = get_random_periods(df, N=num_periods, num_bars=33_000)
 
 long_thres = [-2, -1.5, -1, -0.5, 0]
