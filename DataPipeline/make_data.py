@@ -158,9 +158,9 @@ if __name__ == "__main__":
 
     start_time, end_time    = 1563535876, 1713535876
 
-    symbol      = 'EUR_USD'                 # Symbol over which we gather the data      'BTCUSDT'
+    symbol      = 'GBP_USD'                 # Symbol over which we gather the data      'BTCUSDT'
     market      = "forex"                   # Market from which we gather data          'crypto'
-    interval    = ['1m', '1h', '1d']        # Time interval to make the candlestick
+    interval    = ['1m', '1h'] #, '1d']        # Time interval to make the candlestick
 
     span        = [10, 30, 90]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 100, 500]    # Different windows over which we compute statistics
