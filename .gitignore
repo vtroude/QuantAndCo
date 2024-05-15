@@ -5,6 +5,7 @@
 *.joblib
 *.pkl
 *.env
+*.ipynb
 Data/*
 Score/*
 Model/Classifier/Model/*
