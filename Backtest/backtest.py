@@ -483,6 +483,30 @@ class Backtest:
 
         fig.savefig(file_name)
 
+    
+    def vectorized_backtesting(self):
+        df = self.signal_df.copy()
+
+        # Avoid look-ahead bias by shifting the signal forward by one period
+        # Signals effectively become actionable the next bar
+        df['signal'] = df['signal'].shift(1).fillna(0)
+
+        df['position'] = df['signal'] * self.leverage
+
+        # Calculate daily returns for each asset
+        df["return"] = df[self.price_column].pct_change().fillna(0)
+
+        df["net_position_change"] = df['position'].diff().abs()
+
+        # Calculate portfolio changes from returns
+        df['portfolio_change'] = df[f'position'] * df['return']
+
+        # Calculate cumulative wealth starting from initial_wealth
+        df['Wealth'] = (1+df['portfolio_change'] - self.fees * df["net_position_change"]).cumprod().shift(1) * self.initial_wealth
+        df["fees"] = self.fees * df["Wealth"].shift(1) * df["net_position_change"].shift(1)
+
+        return df
+
 
     def backtest_pairs_trading(self, asset_x, asset_y):
         """
@@ -504,6 +528,9 @@ class Backtest:
         """
 
         df = self.signal_df.copy()
+
+        if 'hedge_ratio' not in df.columns:
+            df['hedge_ratio'] = 1.0
 
         # Avoid look-ahead bias by shifting the signal forward by one period
         # Signals effectively become actionable the next bar
@@ -554,4 +581,6 @@ class Backtest:
     # })
     # result = backtest_pairs_trading(df)
     # print(result.head())
+
+
 

@@ -96,6 +96,12 @@ def dynamicOLS(df, asset_x, asset_y, window):
         df.loc[df.index[w_init:w_last], "z_score"] = resid_zscore
 
         return df
+
+def Spread_PairsTrading(df, asset_x, asset_y, window):
+    df["spread"] = df[asset_y] - df[asset_x]
+    df["spread_moving_avg"] = df["spread"].rolling(window=window, closed='left').mean() #closed='left' excludes the last point in the window - that way, we are avoiding look ahead bias.
+    df["spread_moving_std"] = df["spread"].rolling(window=window, closed='left').std()
+    return df
     
 
 def dynamicOLS_PairsTrading(df, asset_x, asset_y, window):
