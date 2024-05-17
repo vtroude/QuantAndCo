@@ -1,0 +1,28 @@
+2024-05-03 11:45:54,656 - DEBUG - Initializing data checks...
+2024-05-03 11:45:54,657 - DEBUG - Data checks completed.
+2024-05-03 11:45:54,661 - DEBUG - Initializing backtesting...
+2024-05-03 11:45:54,662 - DEBUG - ==================================================
+2024-05-03 11:45:54,663 - DEBUG - NEW Long signal detected on 2024-01-25 17:48:00+00:00
+2024-05-03 11:45:54,663 - DEBUG - Long Trade entered on 2024-01-25 17:49:00+00:00 at entry price: 0.3114452044394813
+2024-05-03 11:45:55,363 - DEBUG - CLOSING Long position on 2024-01-26 02:27:00+00:00
+2024-05-03 11:45:55,363 - DEBUG - Reason: End of backtesting, closing all positions.
+2024-05-03 11:45:55,364 - DEBUG - Trade exited at exit price: 0.3109862750531085
+2024-05-03 11:45:55,364 - DEBUG - Return of trade with leverage 7.366281849809145: -0.010852722913874444
+2024-05-03 11:45:55,364 - DEBUG - Final wealth: 0.985287477082424
+2024-05-03 11:45:55,365 - DEBUG - Backtesting completed.
+2024-05-03 11:45:56,001 - DEBUG - Initializing data checks...
+2024-05-03 11:45:56,002 - DEBUG - Data checks completed.
+2024-05-03 11:45:56,006 - DEBUG - Initializing backtesting...
+2024-05-03 11:45:56,007 - DEBUG - ==================================================
+2024-05-03 11:45:56,008 - DEBUG - NEW Long signal detected on 2022-08-10 02:35:00+00:00
+2024-05-03 11:45:56,008 - DEBUG - Long Trade entered on 2022-08-10 02:36:00+00:00 at entry price: 0.2862474225028848
+2024-05-03 11:45:56,783 - DEBUG - CLOSING Long position on 2022-08-10 10:53:00+00:00
+2024-05-03 11:45:56,783 - DEBUG - Reason: End of backtesting, closing all positions.
+2024-05-03 11:45:56,783 - DEBUG - Trade exited at exit price: 0.28764099355532813
+2024-05-03 11:45:56,783 - DEBUG - Return of trade with leverage 4.933755164168358: 0.024015480995411675
+2024-05-03 11:45:56,784 - DEBUG - Final wealth: 1.0266389729395242
+2024-05-03 11:45:56,784 - DEBUG - Backtesting completed.
+2024-05-03 11:45:57,562 - DEBUG - Initializing data checks...
+2024-05-03 11:45:57,564 - DEBUG - Data checks completed.
+2024-05-03 11:45:57,577 - DEBUG - Initializing backtesting...
+2024-05-03 11:45:58,234 - DEBUG - Backtesting completed.

@@ -186,10 +186,10 @@ if __name__ == "__main__":
 
     # Calculate timestamps for the beginning and end of the 3-year period
     end_time    = int(time.time())                       # Unix timestamp in second
-    start_time  = end_time - (chunk * n_per_chunk * 60)   # 1h in second
+    start_time  = end_time - (chunk * n_per_chunk * 60 * 2)   # 1h in second
 
     symbol      = 'EUR_USD'  # "BTCUSD"
-    interval    = '1m'
+    interval    = '1h'
     market      = 'forex'  # "crypto"
 
     data    = get_time_series(symbol, market, start_time, end_time, interval, chunk, n_jobs=5)

@@ -1,0 +1,112 @@
+2024-04-30 16:30:38,178 - DEBUG - Initializing data checks...
+2024-04-30 16:30:38,185 - DEBUG - Data checks completed.
+2024-04-30 16:30:38,189 - DEBUG - Initializing backtesting...
+2024-04-30 16:30:38,190 - DEBUG - ==================================================
+2024-04-30 16:30:38,190 - DEBUG - NEW Long signal detected on 2023-01-01 23:06:00+00:00
+2024-04-30 16:30:38,190 - DEBUG - Long Trade entered on 2023-01-01 23:12:00+00:00 at entry price: 0.11738028100986186
+2024-04-30 16:30:40,796 - DEBUG - CLOSING Long position on 2023-01-03 14:32:00+00:00
+2024-04-30 16:30:40,796 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-30 16:30:40,796 - DEBUG - Trade exited at exit price: 0.1251142203131559
+2024-04-30 16:30:40,796 - DEBUG - Return of trade with leverage 6.84166758915903: 0.4507064235628096
+2024-04-30 16:30:40,796 - DEBUG - ==================================================
+2024-04-30 16:30:40,796 - DEBUG - 
+
+2024-04-30 16:30:40,798 - DEBUG - ==================================================
+2024-04-30 16:30:40,799 - DEBUG - NEW Long signal detected on 2023-01-03 14:32:00+00:00
+2024-04-30 16:30:40,799 - DEBUG - Long Trade entered on 2023-01-03 14:33:00+00:00 at entry price: 0.12515923108630855
+2024-04-30 16:30:44,397 - DEBUG - CLOSING Long position on 2023-01-05 08:00:00+00:00
+2024-04-30 16:30:44,397 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-30 16:30:44,397 - DEBUG - Trade exited at exit price: 0.1202349254958297
+2024-04-30 16:30:44,397 - DEBUG - Return of trade with leverage 6.84166758915903: -0.26913503931429794
+2024-04-30 16:30:44,397 - DEBUG - ==================================================
+2024-04-30 16:30:44,397 - DEBUG - 
+
+2024-04-30 16:30:44,401 - DEBUG - ==================================================
+2024-04-30 16:30:44,401 - DEBUG - NEW Long signal detected on 2023-01-05 08:00:00+00:00
+2024-04-30 16:30:44,401 - DEBUG - Long Trade entered on 2023-01-05 08:01:00+00:00 at entry price: 0.12039640378526562
+2024-04-30 16:30:44,997 - DEBUG - CLOSING Long position on 2023-01-05 14:23:00+00:00
+2024-04-30 16:30:44,997 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-30 16:30:44,998 - DEBUG - Trade exited at exit price: 0.11594620986852089
+2024-04-30 16:30:44,998 - DEBUG - Return of trade with leverage 6.84166758915903: -0.2528445250979999
+2024-04-30 16:30:44,998 - DEBUG - ==================================================
+2024-04-30 16:30:44,998 - DEBUG - 
+
+2024-04-30 16:30:44,999 - DEBUG - ==================================================
+2024-04-30 16:30:45,000 - DEBUG - NEW Long signal detected on 2023-01-05 14:23:00+00:00
+2024-04-30 16:30:45,000 - DEBUG - Long Trade entered on 2023-01-05 14:24:00+00:00 at entry price: 0.11632212302626588
+2024-04-30 16:30:47,149 - DEBUG - CLOSING Long position on 2023-01-06 15:51:00+00:00
+2024-04-30 16:30:47,149 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-30 16:30:47,149 - DEBUG - Trade exited at exit price: 0.12417120822593386
+2024-04-30 16:30:47,149 - DEBUG - Return of trade with leverage 6.84166758915903: 0.46157774013103153
+2024-04-30 16:30:47,149 - DEBUG - ==================================================
+2024-04-30 16:30:47,149 - DEBUG - 
+
+2024-04-30 16:30:47,151 - DEBUG - ==================================================
+2024-04-30 16:30:47,151 - DEBUG - NEW Long signal detected on 2023-01-06 15:51:00+00:00
+2024-04-30 16:30:47,151 - DEBUG - Long Trade entered on 2023-01-06 15:52:00+00:00 at entry price: 0.12465416480480629
+2024-04-30 16:30:51,069 - DEBUG - CLOSING Long position on 2023-01-10 13:41:00+00:00
+2024-04-30 16:30:51,069 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-30 16:30:51,070 - DEBUG - Trade exited at exit price: 0.12010422615854721
+2024-04-30 16:30:51,070 - DEBUG - Return of trade with leverage 6.84166758915903: -0.2496817965046614
+2024-04-30 16:30:51,070 - DEBUG - ==================================================
+2024-04-30 16:30:51,070 - DEBUG - 
+
+2024-04-30 16:30:51,072 - DEBUG - ==================================================
+2024-04-30 16:30:51,072 - DEBUG - NEW Long signal detected on 2023-01-10 13:41:00+00:00
+2024-04-30 16:30:51,072 - DEBUG - Long Trade entered on 2023-01-10 13:42:00+00:00 at entry price: 0.12009108479349506
+2024-04-30 16:30:53,346 - DEBUG - CLOSING Long position on 2023-01-11 13:52:00+00:00
+2024-04-30 16:30:53,347 - DEBUG - Reason: ['Stop Loss Rule']
+2024-04-30 16:30:53,347 - DEBUG - Trade exited at exit price: 0.11616659441683663
+2024-04-30 16:30:53,347 - DEBUG - Return of trade with leverage 6.84166758915903: -0.22354277297227224
+2024-04-30 16:30:53,347 - DEBUG - ==================================================
+2024-04-30 16:30:53,347 - DEBUG - 
+
+2024-04-30 16:30:53,348 - DEBUG - ==================================================
+2024-04-30 16:30:53,349 - DEBUG - NEW Long signal detected on 2023-01-11 13:52:00+00:00
+2024-04-30 16:30:53,349 - DEBUG - Long Trade entered on 2023-01-11 13:53:00+00:00 at entry price: 0.11595733356155491
+2024-04-30 16:31:01,758 - DEBUG - CLOSING Long position on 2023-01-17 15:02:00+00:00
+2024-04-30 16:31:01,758 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-30 16:31:01,758 - DEBUG - Trade exited at exit price: 0.12480067797391725
+2024-04-30 16:31:01,758 - DEBUG - Return of trade with leverage 6.84166758915903: 0.5216827210487219
+2024-04-30 16:31:01,759 - DEBUG - ==================================================
+2024-04-30 16:31:01,759 - DEBUG - 
+
+2024-04-30 16:31:01,760 - DEBUG - ==================================================
+2024-04-30 16:31:01,760 - DEBUG - NEW Long signal detected on 2023-01-17 15:02:00+00:00
+2024-04-30 16:31:01,760 - DEBUG - Long Trade entered on 2023-01-17 15:03:00+00:00 at entry price: 0.12457919968448095
+2024-04-30 16:31:03,520 - DEBUG - CLOSING Long position on 2023-01-18 11:29:00+00:00
+2024-04-30 16:31:03,521 - DEBUG - Reason: ['Take Profit Rule']
+2024-04-30 16:31:03,521 - DEBUG - Trade exited at exit price: 0.1328569176114116
+2024-04-30 16:31:03,521 - DEBUG - Return of trade with leverage 6.84166758915903: 0.45452023226377325
+2024-04-30 16:31:03,521 - DEBUG - ==================================================
+2024-04-30 16:31:03,521 - DEBUG - 
+
+2024-04-30 16:31:06,484 - DEBUG - Backtesting completed.
+2024-04-30 16:31:07,881 - DEBUG - Initializing data checks...
+2024-04-30 16:31:07,893 - DEBUG - Data checks completed.
+2024-04-30 16:31:07,896 - DEBUG - Initializing backtesting...
+2024-04-30 16:31:34,586 - DEBUG - Backtesting completed.
+2024-04-30 16:32:38,555 - DEBUG - Initializing data checks...
+2024-04-30 16:32:38,564 - DEBUG - Data checks completed.
+2024-04-30 16:32:38,567 - DEBUG - Initializing backtesting...
+2024-04-30 16:33:03,959 - DEBUG - Backtesting completed.
+2024-04-30 16:33:05,394 - DEBUG - Initializing data checks...
+2024-04-30 16:33:05,401 - DEBUG - Data checks completed.
+2024-04-30 16:33:05,404 - DEBUG - Initializing backtesting...
+2024-04-30 16:33:31,573 - DEBUG - Backtesting completed.
+2024-04-30 16:38:23,172 - DEBUG - Initializing data checks...
+2024-04-30 16:38:23,181 - DEBUG - Data checks completed.
+2024-04-30 16:38:23,184 - DEBUG - Initializing backtesting...
+2024-04-30 16:38:49,102 - DEBUG - Backtesting completed.
+2024-04-30 16:38:50,590 - DEBUG - Initializing data checks...
+2024-04-30 16:38:50,599 - DEBUG - Data checks completed.
+2024-04-30 16:38:50,602 - DEBUG - Initializing backtesting...
+2024-04-30 16:39:17,235 - DEBUG - Backtesting completed.
+2024-04-30 16:50:08,025 - DEBUG - Initializing data checks...
+2024-04-30 16:50:08,032 - DEBUG - Data checks completed.
+2024-04-30 16:50:08,035 - DEBUG - Initializing backtesting...
+2024-04-30 16:50:33,357 - DEBUG - Backtesting completed.
+2024-04-30 16:50:34,650 - DEBUG - Initializing data checks...
+2024-04-30 16:50:34,656 - DEBUG - Data checks completed.
+2024-04-30 16:50:34,659 - DEBUG - Initializing backtesting...
+2024-04-30 16:51:00,571 - DEBUG - Backtesting completed.

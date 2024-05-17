@@ -1,9 +1,11 @@
 *__pycache__
 *.csv
+*.log
 *.png
 *.joblib
 *.pkl
 *.env
+*.ipynb
 Data/*
 Score/*
 Model/Classifier/Model/*

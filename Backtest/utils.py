@@ -2,6 +2,43 @@ import pandas as pd
 import numpy as np
 from matplotlib import pylab as pl
 import os
+import logging
+
+import logging
+import os
+
+def set_logs(log_file_name):
+    # Create a logger object
+    logger = logging.getLogger(__name__)
+
+    # Check if the logger has handlers already
+    if not logger.handlers:
+        # Set the level of the logger
+        logger.setLevel(logging.DEBUG)
+
+        # Ensure the directory for logs exists
+        log_directory = "Backtest/Logs"
+        if not os.path.exists(log_directory):
+            os.makedirs(log_directory)  # Use makedirs which can create intermediate directories if needed
+
+        # Create a file handler which logs even debug messages
+        fh = logging.FileHandler(f'{log_directory}/{log_file_name}.log')
+        fh.setLevel(logging.DEBUG)
+
+        # Create a console handler that also logs debug messages
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+
+        # Create formatter and add it to the handlers
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+
+        # Add the handlers to the logger
+        logger.addHandler(fh)
+        logger.addHandler(ch)
+
+    return logger
 
 def market_trading_rules(market):
     if market == 'forex':
@@ -38,7 +75,9 @@ def check_column_index(df, column):
             raise ValueError(f'{column} column missing from dataframe')
         else:
             df[column] = pd.to_datetime(df[column])
-            df.set_index(column, inplace=True)
+            df = df.set_index(column)
+    
+    return df
 
 def check_expected_bars(df, interval, n_trading_hours, n_trading_days):
     start_date = df.index[0]
@@ -119,8 +158,12 @@ def save_plot_strategy(backtest_df: pd.DataFrame) -> None:
     fig.savefig(f"Backtest/Figure/plot_test.png")
 
 if __name__ == '__main__':
-    df = pd.read_csv('/root/QuantAndCo/Data/BTCUSDT_5m_2020-01-01_2024-12-04_backtest_RSI_[20, 100, 200, 500].csv')
-    df_wealth = df[['timestamp', 'Wealth']]
-    display(backtest_metrics(backtest_df=df_wealth, interval='5m', n_trading_hours=24, n_trading_days=365))
+    # Setup logging
+    logger = set_logs("test_logs")
+
+    # Examples of logging at different levels
+    logger.debug("This is a debug message.")
+    logger.info("This is an info message.")
+    logger.warning("This is a warning message.")
 
  

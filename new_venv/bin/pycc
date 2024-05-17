@@ -1,0 +1,3 @@
+#!/root/QuantAndCo/new_venv/bin/python3.10
+from numba.pycc import main
+main()
