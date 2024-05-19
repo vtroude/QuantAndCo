@@ -54,6 +54,7 @@ def MeanReversionIntraday(df, start_time, end_time,
     train_df = df.loc[df.index<=last_train_date]
     comb_train = calculate_periodic_returns(train_df, start_time, end_time)
     mu, sigma = plot_histogram(comb_train, start_time, end_time, price_column)
+    print(f'Avg return between {start_time} and {end_time}: {mu} - Std. dev: {sigma}')
     test_df_init = df.loc[df.index > last_train_date]
 
     comb_test = calculate_periodic_returns(test_df_init, start_time, end_time)
@@ -78,11 +79,13 @@ def MeanReversionIntraday(df, start_time, end_time,
 
     test_df = pd.merge(test_df, test_returns, right_index=True, left_index=True, how='left')
 
-    test_df["signal"] = (test_df[f"{start_time[:2]}-{end_time[:2]}_return"] <= mu + long_thres * sigma) * 1 + (test_df[f"{start_time[:2]}-{end_time[:2]}_return"] >= mu + short_thres * sigma) * -1
+    return_col = f"{start_time[:2]}-{end_time[:2]}_return"
+
+    test_df["signal"] = (test_df[return_col] <= mu + long_thres * sigma) * 1 + (test_df[return_col] >= mu + short_thres * sigma) * -1
 
     test_df = pd.merge(test_df_init, test_df.set_index('close_time').drop(columns="Close"), right_index=True, left_index=True, how='left')
     test_df["signal"].ffill(inplace=True)
-    test_df[f"{start_time[:2]}-{end_time[:2]}_return"].ffill(inplace=True)
+    test_df[return_col].ffill(inplace=True)
 
     test_df["timestamp"] = pd.to_datetime(test_df.index)
     previous_hour = str(int(end_time[:2]) - 1) + ':59'
@@ -94,14 +97,21 @@ def MeanReversionIntraday(df, start_time, end_time,
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('/root/QuantAndCo/Data/forex/EUR_USD/1h/OHLC/2019-07-19 13:31:16_2024-04-19 16:11:16.csv')
+    ####IMPORTANT OBSERVATION: 1M AND 1H DATA NOT SHOWING SAME DATA FOR SAME HOUR: WHY????
+
+    ###NEED TO FIX HOURLY BACKTESTING: I CAN'T EXECUTE AN ORDER 2 HOURS AFTER SIGNAL, NEEDS TO BE FASTER
+
+
+    pd.options.mode.chained_assignment = None  # Suppress SettingWithCopyWarning
+    interval = '1h'
+    df = pd.read_csv(f'/root/QuantAndCo/Data/forex/EUR_USD/{interval}/OHLC/2019-07-19 13:31:16_2024-04-19 16:11:16.csv')
     df.close_time = pd.to_datetime(df.close_time)
     df.set_index('close_time', inplace=True)
     signal_df = MeanReversionIntraday(df, start_time='08:00', end_time='14:00', 
-                                  last_train_date='2020-06-01', price_column="Close", 
-                                  long_thres=-1.0, short_thres=1.0)
-    bt = Backtest(signal_df, 'EURUSD', 'forex', '1h', initial_wealth=10_000,
-                  leverage=10, fees=0.00007)
+                                  last_train_date='2023-06-01', price_column="Close", 
+                                  long_thres=-1.5, short_thres=1.5)
+    bt = Backtest(signal_df, 'EURUSD', 'forex', interval, initial_wealth=10_000,
+                  leverage=10, fees=0.00007, end_date='2024-03-01')
     
     bt_df = bt.vectorized_backtesting()
     metrics = bt.backtest_metrics(bt_df)
