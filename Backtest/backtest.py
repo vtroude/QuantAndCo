@@ -4,6 +4,7 @@ from Backtest.utils import market_trading_rules, check_column_index, check_expec
 import os
 from matplotlib import pylab as pl
 from Backtest.utils import set_logs
+import matplotlib.pyplot as plt
 
 
 class Backtest:
@@ -231,6 +232,19 @@ class Backtest:
     def calculate_perf(self, wealth_df):
 
         return (wealth_df.iloc[-1] / wealth_df.iloc[0]) - 1
+    
+    def max_drawdown(self, backtest_df):
+        df_returns = backtest_df[["Wealth"]].pct_change()
+        cum_returns = (1 + df_returns).cumprod()
+        returns_arr = cum_returns.dropna().values
+        dd_end = np.argmax(np.maximum.accumulate(returns_arr) - returns_arr) # end of the period
+        dd_start = np.argmax(returns_arr[:dd_end]) # start of period
+        max_dd = ( backtest_df.Wealth.iloc[dd_start] - backtest_df.Wealth.iloc[dd_end] ) / backtest_df.Wealth.iloc[dd_start]
+        max_dd_duration = backtest_df.index[dd_end] - backtest_df.index[dd_start]
+        plt.plot(returns_arr)
+        plt.plot([dd_end, dd_start], [returns_arr[dd_end], returns_arr[dd_start]], 'o', color='Red', markersize=10)
+
+        return max_dd, max_dd_duration
         
     
     def backtest_metrics(self, backtest_df, fee_column='fees', 
@@ -239,7 +253,7 @@ class Backtest:
         wealth_df = backtest_df["Wealth"].dropna()
 
 
-        check_column_index(wealth_df, "timestamp")
+        #check_column_index(wealth_df, "timestamp")
         n_trading_hours, n_trading_days = market_trading_rules(self.market)
         n_bars, n_years = check_expected_bars(wealth_df, self.interval, n_trading_hours, n_trading_days)
 
@@ -261,16 +275,16 @@ class Backtest:
         nb_orders = len(backtest_df.loc[backtest_df['signal_change'] != 0])
         trade_frequency = nb_orders / len(backtest_df)
         total_fees = backtest_df[fee_column].sum()
+        max_dd, max_dd_duration = self.max_drawdown(backtest_df)
+        avg_trades_per_day = nb_orders / period.days
 
         
-
-
         metrics = [start, end, period, initial_value, min_value, max_value, end_value, round(total_perf*100, 2), round(CAGR*100, 2), 
-                   round(100*avg_ann_return, 2), round(100*ann_vol, 2), round(sharpe, 2), nb_orders, round(trade_frequency*100, 2),
-                   self.leverage, total_fees, total_fees/initial_value]
+                   round(100*avg_ann_return, 2), round(100*ann_vol, 2), round(sharpe, 2), max_dd, max_dd_duration, nb_orders, round(avg_trades_per_day, 2),
+                   self.leverage, total_fees, round(total_fees/initial_value*100, 2)]
         df_metrics = pd.DataFrame(metrics).T
         df_metrics.columns = ['Start', 'End', 'Period', 'Start Value', 'Min Value', 'Max Value', 'End Value', 'Total Performance [%]', 'CAGR [%]', 'Avg. Return (Ann.) [%]', 'Volatility (Ann.) [%]', 'Sharpe Ratio (Ann.)',
-                              'Orders', 'Trade Frequency [%]', 'Leverage', 'Total Fees [$]', 'Total Fees [%]']
+                              'Max Drawdown', 'Max Drawdown Duration', 'Orders', 'Avg. Trades Per Day', 'Leverage', 'Total Fees [$]', 'Total Fees [%]']
         df_metrics.to_csv(f"Data/Backtest/{self.market}-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-backtest_metrics.csv")
         if return_metric:
             if return_metric == 'total_perf':
