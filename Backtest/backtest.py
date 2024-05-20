@@ -250,14 +250,16 @@ class Backtest:
 
     def trades_statistics(self, backtest_df):
 
-        # Step 1: Identify the rows where the conditions are met
-        trades = (backtest_df['net_position_change'] != 0) & (backtest_df['position'] == 0)
+        long_entries = backtest_df[(backtest_df["position"].shift(1)!=1) & (backtest_df["position"] == 1)]
+        long_exits = backtest_df[(backtest_df["position"].shift(1)==1) & (backtest_df["position"] != 1)]
 
-        # Step 2: Shift these rows by one position
-        trades = trades.shift(-1)
+        short_entries = backtest_df[(backtest_df["position"].shift(1)!=-1) & (backtest_df["position"] == -1)]
+        short_exits = backtest_df[(backtest_df["position"].shift(1)== -1) & (backtest_df["position"] != -1)]
 
-        # Step 3: Filter the DataFrame using these shifted rows
+        trades = (backtest_df['net_position_change'] != 0) & (backtest_df['position'] != backtest_df["net_position_change"])
         trades_df = backtest_df[trades.fillna(False)][["unrealized_pnl"]]
+        trades_df.dropna(inplace=True)
+        nb_orders = len(long_entries) + len(long_exits) + len(short_entries) + len(short_exits)
         avg_trade_return = np.mean(trades_df)
         best_trade = np.max(trades_df)
         worst_trade = np.min(trades_df)
@@ -267,7 +269,7 @@ class Backtest:
         avg_win = np.mean(wins)
         avg_loss = np.mean(losses)
 
-        return avg_trade_return, best_trade, worst_trade, win_rate, avg_win, avg_loss
+        return nb_orders, avg_trade_return, best_trade, worst_trade, win_rate, avg_win, avg_loss
         
     
     def backtest_metrics(self, backtest_df, fee_column='fees', 
@@ -295,12 +297,10 @@ class Backtest:
         max_value = np.max(wealth_df)
         end_value = wealth_df.iloc[-1]
         backtest_df['signal_change'] = backtest_df.signal.diff()
-        nb_orders = len(backtest_df.loc[backtest_df['signal_change'] != 0])
         total_fees = backtest_df[fee_column].sum()
         max_dd, max_dd_duration = self.max_drawdown(backtest_df)
+        nb_orders, avg_trade, best_trade, worst_trade, win_ratio, avg_win, avg_loss = self.trades_statistics(backtest_df)
         avg_trades_per_day = nb_orders / period.days
-
-        avg_trade, best_trade, worst_trade, win_ratio, avg_win, avg_loss = self.trades_statistics(backtest_df)
 
         
         metrics = [start, end, period, self.interval, initial_value, min_value, max_value, end_value, 
@@ -330,6 +330,46 @@ class Backtest:
                 raise ValueError(f"Metric {return_metric} not found")
             
         return df_metrics.T
+    
+    def plot_strategy(self, backtest_df, long_thres=None, short_thres=None):
+
+        # Plotting the price data
+        plt.figure(figsize=(12, 6))
+        plt.plot(backtest_df[self.price_column], label='Price')
+
+        long_entries = backtest_df[(backtest_df["position"].shift(1)!=1) & (backtest_df["position"] == 1)]
+        long_exits = backtest_df[(backtest_df["position"].shift(1)==1) & (backtest_df["position"] != 1)]
+
+        short_entries = backtest_df[(backtest_df["position"].shift(1)!=-1) & (backtest_df["position"] == -1)]
+        short_exits = backtest_df[(backtest_df["position"].shift(1)== -1) & (backtest_df["position"] != -1)]
+
+        # Plot long entries (blue upward triangles)
+        plt.plot(long_entries.index, long_entries[self.price_column], '^', markersize=10, color='blue', lw=0, label='Long Entry')
+
+        # Plot long exits (cyan circles)
+        plt.plot(long_exits.index, long_exits[self.price_column], 'o', markersize=10, color='cyan', lw=0, label='Long Exit')
+
+        # Plot short entries (red downward triangles)
+        plt.plot(short_entries.index, short_entries[self.price_column], 'v', markersize=10, color='red', lw=0, label='Short Entry')
+
+        # Plot short exits (magenta crosses)
+        plt.plot(short_exits.index, short_exits[self.price_column], 'x', markersize=10, color='magenta', lw=0, label='Short Exit')
+        
+        if long_thres:
+            plt.axhline(y=long_thres, color='green', linestyle='--', linewidth=1, label='Long Threshold')
+        
+        if short_thres:
+            plt.axhline(y=short_thres, color='red', linestyle='--', linewidth=1, label='Short Threshold')
+
+
+        # Add labels and legend
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.title('Price with Long/Short Entries and Exits')
+        plt.legend()
+
+        # Show the plot
+        plt.savefig('Data/Backtest/strategy_plot.png')
 
     def plot_equity_curve(self):
         """
@@ -369,13 +409,14 @@ class Backtest:
         # Signals effectively become actionable the next bar
         df['position'] = df['signal'].shift(1).fillna(0) * self.leverage
 
+
         # Calculate daily returns for each asset
         df["return"] = df[self.price_column].pct_change().fillna(0)
 
         df["net_position_change"] = df['position'].diff().abs()
 
         # Calculate portfolio changes from returns
-        df['portfolio_change'] = df[f'position'] * df['return']
+        df['portfolio_change'] = df[f'position'].shift(1) * df['return']
 
         # Determine positions where we go from 0 to 1 or -1
         df['new_position'] = (df['position'] != 0) & (df['position'].shift(1) == 0)
@@ -387,18 +428,17 @@ class Backtest:
         df['entry_price'].ffill(inplace=True)
 
         # Calculate unrealized pnl
-        df['unrealized_pnl'] = df["position"] * ( (df[self.price_column] - df['entry_price']) / df['entry_price'] )
+        df['unrealized_pnl'] = df["position"].shift(1) * ( (df[self.price_column] - df['entry_price']) / df['entry_price'] )
 
         df['stop_triggered'] = ((df['unrealized_pnl'] <= self.stop_loss) | (df['unrealized_pnl'] >= self.take_profit)).shift(1).fillna(False)
 
         df['position'] = df.apply(lambda row: 0 if row['stop_triggered'] else row['position'], axis=1)
 
         df['net_position_change'] = df['position'].diff().abs()
-        df['portfolio_change'] = df['position'] * df['return']
+        df['portfolio_change'] = df['position'].shift(1) * df['return']
 
         # Calculate cumulative wealth starting from initial_wealth
-        df['Wealth'] = (1+df['portfolio_change'] - self.fees * df["net_position_change"]).cumprod().shift(1) * self.initial_wealth
-
+        df['Wealth'] = (1+df['portfolio_change'] - self.fees * df["net_position_change"].shift(1)).cumprod() * self.initial_wealth
         df["fees"] = self.fees * df["Wealth"].shift(1) * df["net_position_change"].shift(1)
 
         return df

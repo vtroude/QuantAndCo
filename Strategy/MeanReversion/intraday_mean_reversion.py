@@ -110,10 +110,10 @@ if __name__ == "__main__":
     signal_df = MeanReversionIntraday(df, start_time='08:00', end_time='14:00', 
                                   last_train_date='2023-06-01', price_column="Close", 
                                   long_thres=-1.5, short_thres=1.5)
-    bt = Backtest(signal_df, 'EURUSD', 'forex', interval, initial_wealth=10_000,
-                  leverage=10, fees=0.00007, end_date='2024-03-01')
+    #bt = Backtest(signal_df, 'EURUSD', 'forex', interval, initial_wealth=10_000,
+    #              leverage=10, fees=0.00007, end_date='2023-06-30')
     
-    bt_df = bt.vectorized_backtesting()
-    metrics = bt.backtest_metrics(bt_df)
-    print(metrics)
+    #bt_df = bt.vectorized_backtesting()
+    #metrics = bt.backtest_metrics(bt_df)
+    #print(metrics)
     
