@@ -4,18 +4,22 @@ from statsmodels.tsa.ar_model import AutoReg
 import numpy as np
 import pandas as pd
 import warnings
-from arch.unitroot import VarianceRatio
+#from arch.unitroot import VarianceRatio
 import matplotlib.pyplot as plt
 
 def assert_timestamp(timeseries, time_col='timestamp'):
-    if time_col != timeseries.index.name:
-        if time_col not in timeseries.columns:
-            raise ValueError(f"{time_col} is missing from timeseries")
+    if isinstance(timeseries, np.ndarray):
+        return pd.Series(timeseries)
+
+    if isinstance(timeseries, pd.DataFrame):
+        if time_col != timeseries.index.name:
+            if time_col not in timeseries.columns:
+                raise ValueError(f"{time_col} is missing from timeseries")
+            else:
+                timeseries.index = pd.to_datetime(timeseries[time_col])
         else:
-            timeseries.index = pd.to_datetime(timeseries[time_col])
-    else:
-        if isinstance(timeseries.index, pd.DatetimeIndex) == False:
-            timeseries.index = pd.to_datetime(timeseries.index)
+            if isinstance(timeseries.index, pd.DatetimeIndex) == False:
+                timeseries.index = pd.to_datetime(timeseries.index)
     
     return timeseries.sort_index(ascending=True)
 
@@ -141,6 +145,7 @@ def HurstExponent(S,q=2):
     
     return mH
 
+'''
 def Variance_Ratio_test(timeseries, lags=2):
     """
     Null hypothesis: the process is a random-walk (i.e. non-stationary / non mean-reverting)
@@ -150,7 +155,7 @@ def Variance_Ratio_test(timeseries, lags=2):
     ratio = vr.vr
     pvalue = vr.pvalue
     return ratio, pvalue
-
+'''
 
 def Check_Mean_Reversion(timeseries):
     #1. We plot the timeseries - a mean reverting time series should be "pulled back" to its mean
