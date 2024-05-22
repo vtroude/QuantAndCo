@@ -4,6 +4,7 @@ from Backtest.utils import market_trading_rules, check_column_index, check_expec
 import os
 from matplotlib import pylab as pl
 from Backtest.utils import set_logs
+import matplotlib.pyplot as plt
 
 
 class Backtest:
@@ -231,6 +232,44 @@ class Backtest:
     def calculate_perf(self, wealth_df):
 
         return (wealth_df.iloc[-1] / wealth_df.iloc[0]) - 1
+    
+    def max_drawdown(self, backtest_df):
+        df_returns = backtest_df[["Wealth"]].pct_change()
+        cum_returns = (1 + df_returns).cumprod()
+        drawdown =  1 - cum_returns.div(cum_returns.cummax())
+        returns_arr = cum_returns.dropna().values
+        dd_end = np.argmax(np.maximum.accumulate(returns_arr) - returns_arr) # end of the period
+        dd_start = np.argmax(returns_arr[:dd_end]) # start of period
+        max_dd = np.max(drawdown)
+        max_dd_duration = backtest_df.index[dd_end] - backtest_df.index[dd_start]
+        plt.plot(returns_arr)
+        plt.plot([dd_end, dd_start], [returns_arr[dd_end], returns_arr[dd_start]], 'o', color='Red', markersize=10)
+        
+
+        return max_dd, max_dd_duration
+
+    def trades_statistics(self, backtest_df):
+
+        long_entries = backtest_df[(backtest_df["position"].shift(1)!=1) & (backtest_df["position"] == 1)]
+        long_exits = backtest_df[(backtest_df["position"].shift(1)==1) & (backtest_df["position"] != 1)]
+
+        short_entries = backtest_df[(backtest_df["position"].shift(1)!=-1) & (backtest_df["position"] == -1)]
+        short_exits = backtest_df[(backtest_df["position"].shift(1)== -1) & (backtest_df["position"] != -1)]
+
+        trades = (backtest_df['net_position_change'] != 0) & (backtest_df['position'] != backtest_df["net_position_change"])
+        trades_df = backtest_df[trades.fillna(False)][["unrealized_pnl"]]
+        trades_df.dropna(inplace=True)
+        nb_orders = len(long_entries) + len(long_exits) + len(short_entries) + len(short_exits)
+        avg_trade_return = np.mean(trades_df)
+        best_trade = np.max(trades_df)
+        worst_trade = np.min(trades_df)
+        wins = trades_df.loc[trades_df.unrealized_pnl > 0]
+        losses = trades_df.loc[trades_df.unrealized_pnl < 0]
+        win_rate = len(wins) / len(trades_df)
+        avg_win = np.mean(wins)
+        avg_loss = np.mean(losses)
+
+        return nb_orders, avg_trade_return, best_trade, worst_trade, win_rate, avg_win, avg_loss
         
     
     def backtest_metrics(self, backtest_df, fee_column='fees', 
@@ -239,7 +278,7 @@ class Backtest:
         wealth_df = backtest_df["Wealth"].dropna()
 
 
-        check_column_index(wealth_df, "timestamp")
+        #check_column_index(wealth_df, "timestamp")
         n_trading_hours, n_trading_days = market_trading_rules(self.market)
         n_bars, n_years = check_expected_bars(wealth_df, self.interval, n_trading_hours, n_trading_days)
 
@@ -258,19 +297,23 @@ class Backtest:
         max_value = np.max(wealth_df)
         end_value = wealth_df.iloc[-1]
         backtest_df['signal_change'] = backtest_df.signal.diff()
-        nb_orders = len(backtest_df.loc[backtest_df['signal_change'] != 0])
-        trade_frequency = nb_orders / len(backtest_df)
         total_fees = backtest_df[fee_column].sum()
+        max_dd, max_dd_duration = self.max_drawdown(backtest_df)
+        nb_orders, avg_trade, best_trade, worst_trade, win_ratio, avg_win, avg_loss = self.trades_statistics(backtest_df)
+        avg_trades_per_day = nb_orders / period.days
 
         
-
-
-        metrics = [start, end, period, initial_value, min_value, max_value, end_value, round(total_perf*100, 2), round(CAGR*100, 2), 
-                   round(100*avg_ann_return, 2), round(100*ann_vol, 2), round(sharpe, 2), nb_orders, round(trade_frequency*100, 2),
-                   self.leverage, total_fees, total_fees/initial_value]
+        metrics = [start, end, period, self.interval, initial_value, min_value, max_value, end_value, 
+                   round(total_perf*100, 2), round(CAGR*100, 2), 
+                   round(100*avg_ann_return, 2), round(100*ann_vol, 2), round(sharpe, 2), 
+                   round(max_dd, 4), max_dd_duration, nb_orders, round(avg_trade*100, 2), 
+                   round(win_ratio*100, 2), round(avg_win*100, 2), round(avg_loss*100, 2),
+                   round(best_trade*100, 2), round(worst_trade*100, 2),
+                   round(avg_trades_per_day, 2), self.leverage, total_fees, 
+                   round(total_fees/initial_value*100, 2)]
         df_metrics = pd.DataFrame(metrics).T
-        df_metrics.columns = ['Start', 'End', 'Period', 'Start Value', 'Min Value', 'Max Value', 'End Value', 'Total Performance [%]', 'CAGR [%]', 'Avg. Return (Ann.) [%]', 'Volatility (Ann.) [%]', 'Sharpe Ratio (Ann.)',
-                              'Orders', 'Trade Frequency [%]', 'Leverage', 'Total Fees [$]', 'Total Fees [%]']
+        df_metrics.columns = ['Start', 'End', 'Period', 'Strategy Frequency', 'Start Value', 'Min Value', 'Max Value', 'End Value', 'Total Performance [%]', 'CAGR [%]', 'Avg. Return (Ann.) [%]', 'Volatility (Ann.) [%]', 'Sharpe Ratio (Ann.)',
+                              'Max Drawdown', 'Max Drawdown Duration', 'Orders', 'Avg. Trade Return [%]', 'Win Rate [%]', 'Avg. Win [%]', 'Avg. Loss [%]', 'Best Trade [%]', 'Worst Trade [%]', 'Avg. Trades Per Day', 'Leverage', 'Total Fees [$]', 'Total Fees [%]']
         df_metrics.to_csv(f"Data/Backtest/{self.market}-{self.symbol}-{self.interval}-{self.first_date}-{self.last_date}-backtest_metrics.csv")
         if return_metric:
             if return_metric == 'total_perf':
@@ -287,6 +330,46 @@ class Backtest:
                 raise ValueError(f"Metric {return_metric} not found")
             
         return df_metrics.T
+    
+    def plot_strategy(self, backtest_df, long_thres=None, short_thres=None):
+
+        # Plotting the price data
+        plt.figure(figsize=(12, 6))
+        plt.plot(backtest_df[self.price_column], label='Price')
+
+        long_entries = backtest_df[(backtest_df["position"].shift(1)!=1) & (backtest_df["position"] == 1)]
+        long_exits = backtest_df[(backtest_df["position"].shift(1)==1) & (backtest_df["position"] != 1)]
+
+        short_entries = backtest_df[(backtest_df["position"].shift(1)!=-1) & (backtest_df["position"] == -1)]
+        short_exits = backtest_df[(backtest_df["position"].shift(1)== -1) & (backtest_df["position"] != -1)]
+
+        # Plot long entries (blue upward triangles)
+        plt.plot(long_entries.index, long_entries[self.price_column], '^', markersize=10, color='blue', lw=0, label='Long Entry')
+
+        # Plot long exits (cyan circles)
+        plt.plot(long_exits.index, long_exits[self.price_column], 'o', markersize=10, color='cyan', lw=0, label='Long Exit')
+
+        # Plot short entries (red downward triangles)
+        plt.plot(short_entries.index, short_entries[self.price_column], 'v', markersize=10, color='red', lw=0, label='Short Entry')
+
+        # Plot short exits (magenta crosses)
+        plt.plot(short_exits.index, short_exits[self.price_column], 'x', markersize=10, color='magenta', lw=0, label='Short Exit')
+        
+        if long_thres:
+            plt.axhline(y=long_thres, color='green', linestyle='--', linewidth=1, label='Long Threshold')
+        
+        if short_thres:
+            plt.axhline(y=short_thres, color='red', linestyle='--', linewidth=1, label='Short Threshold')
+
+
+        # Add labels and legend
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.title('Price with Long/Short Entries and Exits')
+        plt.legend()
+
+        # Show the plot
+        plt.savefig('Data/Backtest/strategy_plot.png')
 
     def plot_equity_curve(self):
         """
@@ -324,9 +407,8 @@ class Backtest:
 
         # Avoid look-ahead bias by shifting the signal forward by one period
         # Signals effectively become actionable the next bar
-        df['signal'] = df['signal'].shift(1).fillna(0)
+        df['position'] = df['signal'].shift(1).fillna(0) * self.leverage
 
-        df['position'] = df['signal'] * self.leverage
 
         # Calculate daily returns for each asset
         df["return"] = df[self.price_column].pct_change().fillna(0)
@@ -334,7 +416,7 @@ class Backtest:
         df["net_position_change"] = df['position'].diff().abs()
 
         # Calculate portfolio changes from returns
-        df['portfolio_change'] = df[f'position'] * df['return']
+        df['portfolio_change'] = df[f'position'].shift(1) * df['return']
 
         # Determine positions where we go from 0 to 1 or -1
         df['new_position'] = (df['position'] != 0) & (df['position'].shift(1) == 0)
@@ -346,18 +428,17 @@ class Backtest:
         df['entry_price'].ffill(inplace=True)
 
         # Calculate unrealized pnl
-        df['unrealized_pnl'] = df["position"] * ( (df[self.price_column] - df['entry_price']) / df['entry_price'] )
+        df['unrealized_pnl'] = df["position"].shift(1) * ( (df[self.price_column] - df['entry_price']) / df['entry_price'] )
 
         df['stop_triggered'] = ((df['unrealized_pnl'] <= self.stop_loss) | (df['unrealized_pnl'] >= self.take_profit)).shift(1).fillna(False)
 
         df['position'] = df.apply(lambda row: 0 if row['stop_triggered'] else row['position'], axis=1)
 
         df['net_position_change'] = df['position'].diff().abs()
-        df['portfolio_change'] = df['position'] * df['return']
+        df['portfolio_change'] = df['position'].shift(1) * df['return']
 
         # Calculate cumulative wealth starting from initial_wealth
-        df['Wealth'] = (1+df['portfolio_change'] - self.fees * df["net_position_change"]).cumprod().shift(1) * self.initial_wealth
-
+        df['Wealth'] = (1+df['portfolio_change'] - self.fees * df["net_position_change"].shift(1)).cumprod() * self.initial_wealth
         df["fees"] = self.fees * df["Wealth"].shift(1) * df["net_position_change"].shift(1)
 
         return df

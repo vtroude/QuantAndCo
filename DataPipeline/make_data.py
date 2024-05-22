@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
     symbols      = ["GBP_USD", "EUR_USD"]                # Symbol over which we gather the data      'BTCUSDT'
     market      = "forex"                   # Market from which we gather data          'crypto'
-    interval    = ['1h']        # Time interval to make the candlestick
+    interval    = ['1d']        # Time interval to make the candlestick
 
     span        = [10, 30, 90, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 50, 100]    # Different windows over which we compute statistics
