@@ -1,7 +1,7 @@
 import numpy    as np
 import pandas   as pd
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from DataPipeline.make_data import make_filename
 
@@ -90,10 +90,11 @@ def get_targets(price, n_points=60):
 #######################################################################################################################
 
 def get_price_data(
+                    market: str,
                     symbol: str,
                     interval: str,
-                    date1: str,
-                    date2: str,
+                    date1: Union[str, int],
+                    date2: Union[str, int],
                     ) -> pd.DataFrame:
     """
     Get OHLC price
@@ -109,13 +110,13 @@ def get_price_data(
     ###############################################################################################
 
     # Get OHLC from csv data
-    price   = pd.read_csv(make_filename(symbol, interval[0], date1, date2, "ohlc"), index_col=0)
+    price   = pd.read_csv(make_filename(market, symbol, interval, date1, date2, "OHLC"), index_col=0)
     # Make datetime index
     price.index = pd.to_datetime(price.index, format="ISO8601")
     # Format OHLC columns name
     price   = price.rename(columns={o.lower(): o for o in ['Open', 'High', 'Low', 'Close', 'Volume']})
 
-    return price
+    return price.sort_index()
 
 #######################################################################################################################
 

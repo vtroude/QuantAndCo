@@ -106,7 +106,6 @@ def hurst_entry_exit(
         return pd.Series({c: None for c in ["signal", "exit", cols_w]})
 
     signal  = signal.rename({"weight": cols_w})
-    print(signal)
 
     # Get the index of the minimum z-score
     index_0 = int(np.minimum(window_length + signal["exit"], len(data)))

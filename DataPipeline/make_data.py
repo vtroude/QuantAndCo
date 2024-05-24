@@ -1,9 +1,8 @@
 import os
-import time
 
 import pandas   as pd
 
-from datetime   import datetime
+from typing import Union
 
 from DataPipeline.fetch_data                import get_time_series
 from DataPipeline.technicals_indicators     import TechnicalIndicators
@@ -16,7 +15,14 @@ File to gather data and technical indicators from different sources
 
 #######################################################################################################################
 
-def make_filename(market: str, symbol: str, interval: str, date1: str, date2: str, data_type: str) -> str:
+def make_filename(
+                    market: str,
+                    symbol: str,
+                    interval: str,
+                    date1: Union[str, int],
+                    date2: Union[str, int],
+                    data_type: str
+                ) -> str:
     """
     Make file name
     
@@ -24,8 +30,8 @@ def make_filename(market: str, symbol: str, interval: str, date1: str, date2: st
         - market:       market of the asset e.g. 'crypto', 'forex', etc...
         - symbol:       asset symbol e.g. 'BTCUSD'
         - interval:     Candlestick time interval e.g. '1m'
-        - t1:           Date from which the data has been gathered in unix timestamp
-        - t2:           Date to which the data has been gathered in unix timestamp
+        - date1:        Date from which the data has been gathered in unix timestamp
+        - date2:        Date to which the data has been gathered in unix timestamp
         - data_type:    type of data e.g. ohlc, ti (technical indicators), etc...
     
     Output:
@@ -181,9 +187,9 @@ if __name__ == "__main__":
     span        = [10, 30, 50, 100, 200, 500, 1000, 2000, 5000, 10_000, 15_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 100, 500]    # Different windows over which we compute statistics
 
-    symbols      = ["GBP_USD", "EUR_USD"]                # Symbol over which we gather the data      'BTCUSDT'
+    symbols      = ["CHF_USD"]                # Symbol over which we gather the data      'BTCUSDT'
     market      = "forex"                   # Market from which we gather data          'crypto'
-    interval    = ['1d']        # Time interval to make the candlestick
+    interval    = ['1m']        # Time interval to make the candlestick
 
     span        = [10, 30, 90, 200, 500, 1000, 2000, 5000, 10_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 50, 100]    # Different windows over which we compute statistics

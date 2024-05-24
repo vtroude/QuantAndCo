@@ -6,13 +6,16 @@ from matplotlib import pylab as pl
 from Backtest.utils import set_logs
 import matplotlib.pyplot as plt
 
+from typing import Callable, List, Optional
+
+from Strategy.utils import get_strategy
 
 class Backtest:
     def __init__(self, signal_df: pd.DataFrame, symbol: str, market: str, 
                 interval: str, start_date: str=None, end_date: str=None,
                 price_column: str='Close', initial_wealth: float=1.0,
                 leverage: float=1.0, fees: float=0.0, slippage: float=0.0, 
-                take_profit: float=1000, stop_loss: float=-1000, check_data=False):
+                take_profit: Optional[float]=None, stop_loss: Optional[float]=None, check_data=False):
         """
         This function takes as input a strategy dataframe which contains the price 
         of the asset and signals of the strategy, and returns the wealth of the portfolio.
@@ -430,9 +433,9 @@ class Backtest:
         # Calculate unrealized pnl
         df['unrealized_pnl'] = df["position"].shift(1) * ( (df[self.price_column] - df['entry_price']) / df['entry_price'] )
 
-        df['stop_triggered'] = ((df['unrealized_pnl'] <= self.stop_loss) | (df['unrealized_pnl'] >= self.take_profit)).shift(1).fillna(False)
-
-        df['position'] = df.apply(lambda row: 0 if row['stop_triggered'] else row['position'], axis=1)
+        if not self.stop_loss is None and self.take_profit is None:
+            df['stop_triggered'] = ((df['unrealized_pnl'] <= self.stop_loss) | (df['unrealized_pnl'] >= self.take_profit)).shift(1).fillna(False)
+            df['position'] = df.apply(lambda row: 0 if row['stop_triggered'] else row['position'], axis=1)
 
         df['net_position_change'] = df['position'].diff().abs()
         df['portfolio_change'] = df['position'].shift(1) * df['return']
@@ -495,3 +498,89 @@ class Backtest:
 
         return df
 
+#######################################################################################################################
+
+def backtest_signal(
+                        data: pd.DataFrame,
+                        signal_func: Callable,
+                        market: str,
+                        interval: str,
+                        cols: List[str]=["close"],
+                        n_jobs: Optional[int]=1,
+                        **kwargs
+                    ) -> pd.DataFrame:
+    """
+    Perform a backtest on a given dataset using a given signal function.
+
+    Parameters:
+    - data:         A numpy array or pandas DataFrame containing the time series data.
+    - signal_func:  The signal function to use for the backtest.
+    - kwargs:       Additional keyword arguments to pass to the signal function.
+
+    Returns:
+    - backtest_df:  A pandas DataFrame containing the backtest results.
+    """
+
+    # Get signal to backtest
+    signal_to_backtest  = get_strategy(data, signal_func, cols=cols, n_jobs=n_jobs, **kwargs)
+
+    # Get portfolio weight columns name
+    cols_w  = [ f'{c} weight' for c in cols ]
+
+    # Get triggered signals
+    signals = signal_to_backtest.dropna()
+    signals = signals[signals["signal"] != 0]
+
+    # Get portfolio / symbol
+    symbol  = "/".join(cols)
+
+    for i in signals.index:
+        to_backtest = pd.DataFrame()
+        to_backtest["portfolio"]    = (signal_to_backtest[cols].loc[i:data.loc[signals.loc[i, "exit"]:].index[1]]*signal_to_backtest[cols_w].loc[i].to_numpy()).sum(axis=1)
+        to_backtest["signal"]       = signals.loc[i, "signal"]
+        to_backtest.loc[to_backtest.index[-2:], "signal"]   = 0
+
+        df  = Backtest(to_backtest, symbol=symbol, market=market, interval=interval, price_column="portfolio").vectorized_backtesting()
+        print(df)
+
+#######################################################################################################################
+
+
+
+if __name__ == "__main__":
+    from DataPipeline.get_data  import get_price_data
+
+    from Strategy.MeanReversion.hurst import hurst_entry_exit
+    #from Strategy.utils import prepare_data
+
+    #/home/virgile/Desktop/Trading/QuantDotCom/QuantAndCo/Data/forex/EUR_USD/1m/OHLC/1563535876_1713535876.csv
+
+    n_jobs  = 10
+
+    window_length   = 60 * 24 * 30
+
+    market      = "forex"
+    interval    = "1m"
+    start       = 1563535876
+    end         = 1713535876
+
+    symbols = ["EUR_USD"]
+
+    # Load the data
+    data            = pd.concat([get_price_data(market=market, symbol=s, interval=interval, date1=start, date2=end)["Close"] for s in symbols], axis=1)
+    data.columns    = symbols
+
+    print(data)
+    print(window_length)
+
+    # Prepare the data
+    #data = prepare_data(price_df, indicators_df)
+
+    # Perform a backtest
+    backtest_signal(data, hurst_entry_exit, market=market, interval=interval, cols=symbols, window_length=window_length, n_jobs=n_jobs)
+
+
+
+
+
+    
