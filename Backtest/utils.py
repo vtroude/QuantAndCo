@@ -157,6 +157,8 @@ def save_plot_strategy(backtest_df: pd.DataFrame) -> None:
 
     fig.savefig(f"Backtest/Figure/plot_test.png")
 
+#######################################################################################################################
+
 if __name__ == '__main__':
     # Setup logging
     logger = set_logs("test_logs")

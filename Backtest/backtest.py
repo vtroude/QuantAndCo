@@ -6,9 +6,14 @@ from matplotlib import pylab as pl
 from Backtest.utils import set_logs
 import matplotlib.pyplot as plt
 
+from joblib import Parallel, delayed
+
 from typing import Callable, List, Optional
 
-from Strategy.utils import get_strategy
+from Strategy.signal    import Signal
+#from Strategy.utils     import get_strategy
+
+import pylab    as pl
 
 class Backtest:
     def __init__(self, signal_df: pd.DataFrame, symbol: str, market: str, 
@@ -253,16 +258,18 @@ class Backtest:
 
     def trades_statistics(self, backtest_df):
 
-        long_entries = backtest_df[(backtest_df["position"].shift(1)!=1) & (backtest_df["position"] == 1)]
-        long_exits = backtest_df[(backtest_df["position"].shift(1)==1) & (backtest_df["position"] != 1)]
+        #long_entries = backtest_df[(backtest_df["position"].shift(1)!=1) & (backtest_df["position"] == 1)]
+        #long_exits = backtest_df[(backtest_df["position"].shift(1)==1) & (backtest_df["position"] != 1)]
 
-        short_entries = backtest_df[(backtest_df["position"].shift(1)!=-1) & (backtest_df["position"] == -1)]
-        short_exits = backtest_df[(backtest_df["position"].shift(1)== -1) & (backtest_df["position"] != -1)]
+        #short_entries = backtest_df[(backtest_df["position"].shift(1)!=-1) & (backtest_df["position"] == -1)]
+        #short_exits = backtest_df[(backtest_df["position"].shift(1)== -1) & (backtest_df["position"] != -1)]
 
-        trades = (backtest_df['net_position_change'] != 0) & (backtest_df['position'] != backtest_df["net_position_change"])
+        #trades = (backtest_df['net_position_change'] != 0) & (backtest_df['position'] != backtest_df["net_position_change"])
+        trades = backtest_df['net_position_change'] != 0
         trades_df = backtest_df[trades.fillna(False)][["unrealized_pnl"]]
         trades_df.dropna(inplace=True)
-        nb_orders = len(long_entries) + len(long_exits) + len(short_entries) + len(short_exits)
+        #nb_orders = len(long_entries) + len(long_exits) + len(short_entries) + len(short_exits)
+        nb_orders   = len(trades)
         avg_trade_return = np.mean(trades_df)
         best_trade = np.max(trades_df)
         worst_trade = np.min(trades_df)
@@ -299,7 +306,7 @@ class Backtest:
         min_value = np.min(wealth_df)
         max_value = np.max(wealth_df)
         end_value = wealth_df.iloc[-1]
-        backtest_df['signal_change'] = backtest_df.signal.diff()
+        #backtest_df['signal_change'] = backtest_df.signal.diff()
         total_fees = backtest_df[fee_column].sum()
         max_dd, max_dd_duration = self.max_drawdown(backtest_df)
         nb_orders, avg_trade, best_trade, worst_trade, win_ratio, avg_win, avg_loss = self.trades_statistics(backtest_df)
@@ -497,51 +504,134 @@ class Backtest:
         df["fees"] = self.fees * df["Wealth"].shift(1) * df["net_position_change"].shift(1)
 
         return df
+    
+    def vectorized_backtest_multi_asset_trading(self, symbols):
+        df          = self.signal_df.copy()
+        s_weight    = [f"{s} weight" for s in symbols]
+        s_entry     = [f"{s} entry" for s in symbols]
+
+        df[s_weight]    = df[s_weight].shift(1).fillna(0) * self.leverage
+        asset_pct       = df[symbols].pct_change().fillna(0)
+
+        df['net_position_change']   = df[s_weight].diff().abs().sum(axis=1)
+
+        df['new_position']                  = df['net_position_change'].shift(-1) != 0
+        df.loc[df['new_position'], s_entry] = df[symbols][df['new_position']]
+        
+        df[s_entry].ffill(inplace=True)
+
+        df['unrealized_pnl']    = (df[s_weight].shift(1) * ( (df[symbols] - df[s_entry]) / df[s_entry] )).sum(axis=1)
+        if not self.stop_loss is None and self.take_profit is None:
+            df['stop_triggered']    = ((df['unrealized_pnl'] <= self.stop_loss) | (df['unrealized_pnl'] >= self.take_profit)).shift(1).fillna(False)
+            #df[s_weight]            = df.apply(lambda row: [0]*len(symbols) if row['stop_triggered'] else row[s_weight], axis=1)
+            df.loc[df['stop_triggered'], s_weight]  = 0
+        
+        df['net_position_change']   = df[s_weight].diff().abs().sum(axis=1)
+
+        df["portfolio_change"]  = (df[s_weight].to_numpy() * asset_pct).sum(axis=1)
+        df["Wealth"]            = (1. + df['portfolio_change']  - self.fees * df["net_position_change"]).cumprod().shift(1) * self.initial_wealth
+
+        df['fees']  = self.fees * df["Wealth"].shift(1) * df["net_position_change"].shift(1)
+
+        return df
+
 
 #######################################################################################################################
 
-def backtest_signal(
-                        data: pd.DataFrame,
-                        signal_func: Callable,
-                        market: str,
-                        interval: str,
-                        cols: List[str]=["close"],
-                        n_jobs: Optional[int]=1,
-                        **kwargs
-                    ) -> pd.DataFrame:
-    """
-    Perform a backtest on a given dataset using a given signal function.
+class BacktestSignal():
 
-    Parameters:
-    - data:         A numpy array or pandas DataFrame containing the time series data.
-    - signal_func:  The signal function to use for the backtest.
-    - kwargs:       Additional keyword arguments to pass to the signal function.
+    def __init__(self, signal: Signal):
+        """
+        Initialize backtest procedure to test each signals over a defined portfolio
 
-    Returns:
-    - backtest_df:  A pandas DataFrame containing the backtest results.
-    """
+        Parameters:
+        - signal:   Signal object to backtest
+        """
 
-    # Get signal to backtest
-    signal_to_backtest  = get_strategy(data, signal_func, cols=cols, n_jobs=n_jobs, **kwargs)
+        self.signal = signal
 
-    # Get portfolio weight columns name
-    cols_w  = [ f'{c} weight' for c in cols ]
+    def backtest_signal(self, signal: pd.Series) -> pd.Series:
+        """
+        Perform a backtest on a given signal, composed of an entry and exit point, on a given portfolio.
 
-    # Get triggered signals
-    signals = signal_to_backtest.dropna()
-    signals = signals[signals["signal"] != 0]
+        Parameters:
+        - signal:   A pandas Series containing the entry and exit points of the signal + portfolio weights
 
-    # Get portfolio / symbol
-    symbol  = "/".join(cols)
+        Returns:
+        - backtest: A pandas Series containing the backtest results for the given signal
+        """
 
-    for i in signals.index:
-        to_backtest = pd.DataFrame()
-        to_backtest["portfolio"]    = (signal_to_backtest[cols].loc[i:data.loc[signals.loc[i, "exit"]:].index[1]]*signal_to_backtest[cols_w].loc[i].to_numpy()).sum(axis=1)
-        to_backtest["signal"]       = signals.loc[i, "signal"]
-        to_backtest.loc[to_backtest.index[-2:], "signal"]   = 0
+        growth_rate = self.pct.loc[signal["entry"]:signal["exit"]]
+        if len(growth_rate) > 10:
+            growth_rate *= signal["signal"]*signal[self.cols_w].to_numpy()
+            growth_rate = growth_rate.to_numpy().astype("float") if len(self.cols_w) == 1 else growth_rate.sum(axis=1).to_numpy().astype("float")
+            growth_rate += 1.
+            
+            log_r   = np.log(growth_rate)
+            wealth  = np.cumprod(growth_rate)
 
-        df  = Backtest(to_backtest, symbol=symbol, market=market, interval=interval, price_column="portfolio").vectorized_backtesting()
-        print(df)
+            '''
+            pl.figure()
+            price   = self.data.loc[signal["entry"]:signal["exit"]]
+            z_score = (np.log(price)*signal[self.cols_w].to_numpy()).sum(axis=1).to_numpy().astype("float")
+            z_score = (z_score - signal["mean"])/signal["std"]
+            price   /= price.iloc[0]
+
+            price_  = self.data.loc[:signal["entry"]].iloc[-window_length:]
+            z_score_ = (np.log(price_)*signal[self.cols_w].to_numpy()).sum(axis=1).to_numpy().astype("float")
+            z_score_ = (z_score_ - signal["mean"])/signal["std"]
+
+            pl.plot(price.index, price - 1.)
+            pl.plot(price.index, wealth - 1., "k")
+            pl.plot(price.index, z_score/100, "r")
+            pl.plot(price_.index, z_score_/100, "g")
+            pl.grid()
+            pl.show()
+            '''
+
+            signal["success"]       = np.mean(log_r) / np.mean(np.abs(log_r))
+            signal["Sharpe Ratio"]  = np.sqrt(365*24*60/len(wealth)) * np.mean(log_r) / np.std(log_r)
+            signal["CAGR"]          = (wealth[-1]) ** (365*24*60/len(wealth)) - 1.
+            signal['Max Drawdown']  = np.min(wealth) -1.
+            signal['Max Drawup']    = np.max(wealth) -1.
+            for q in [0.05, 0.25, 0.5, 0.75, 0.95]:
+                signal[f'Quantile {q}'] = np.quantile(wealth, q) - 1.
+            signal['Total'] = wealth[-1] - 1.
+
+        return signal
+
+    def backtest(self, data: pd.DataFrame, n_jobs: Optional[int]=1, cols: Optional[List[str]]=None, **kwargs) -> pd.DataFrame:
+        """
+        Perform a backtest on a given dataset using a given signal function.
+
+        Parameters:
+        - data:         A numpy array or pandas DataFrame containing the time series data.
+        - n_jobs:       Number of parallel jobs to run. If None, the backtest will be run in a single process.
+        - cols:         List of columns to use for the backtest.
+        - kwargs:       Additional keyword arguments to pass to the signal function.
+
+        Returns:
+        - backtest_df:  A pandas DataFrame containing the backtest results for each entry/exit signal pair on a given portfolio
+        """
+
+        # Get signals
+        signals = self.signal.full_backtest(data, n_jobs=n_jobs, cols=cols, **kwargs)
+        print(signals)
+
+        # Get data and define asset columns & protfolio weight column names
+        self.data, self.cols    = self.signal.get_data(data, cols=cols)
+        self.cols_w             = self.signal.get_cols_weight(cols=self.cols)
+        
+        # Shift the data to avoid look-ahead bias and get the growth rate
+        self.pct    = self.data.shift(-2).pct_change()
+
+        # Perform the backtest on each signal
+        if n_jobs is None or n_jobs <2:
+            return signals.apply(self.backtest_signal, axis=1)
+        
+        return pd.DataFrame(Parallel(n_jobs=n_jobs)(delayed(self.backtest_signal)(signal) for _, signal in signals.iterrows()))
+    
+
 
 #######################################################################################################################
 
@@ -549,36 +639,61 @@ def backtest_signal(
 
 if __name__ == "__main__":
     from DataPipeline.get_data  import get_price_data
+    from Strategy.MeanReversion.mean_reversing  import MeanReversion, PairsMeanReversion, MultiMeanReversion
 
-    from Strategy.MeanReversion.hurst import hurst_entry_exit
-    #from Strategy.utils import prepare_data
+    n_jobs  = 7
 
-    #/home/virgile/Desktop/Trading/QuantDotCom/QuantAndCo/Data/forex/EUR_USD/1m/OHLC/1563535876_1713535876.csv
+    step            = 60 * 24
+    look_a_head     = 60 * 24 * 2
+    window_length   = 60 * 24 * 10
+    min_timescale   = 30
+    max_timescale   = 60 * 24
+    use_log         = True
 
-    n_jobs  = 10
-
-    window_length   = 60 * 24 * 30
+    entry_thresh    = 3.
+    exit_thresh     = 1.
 
     market      = "forex"
     interval    = "1m"
     start       = 1563535876
     end         = 1713535876
 
-    symbols = ["EUR_USD"]
+    symbols = ["EUR_USD", "GBP_USD"]
 
     # Load the data
-    data            = pd.concat([get_price_data(market=market, symbol=s, interval=interval, date1=start, date2=end)["Close"] for s in symbols], axis=1)
+    data            = pd.concat([get_price_data(market=market, symbol=s, interval=interval, date1=start, date2=end)["Close"] for s in symbols], axis=1).dropna()
     data.columns    = symbols
 
     print(data)
-    print(window_length)
 
     # Prepare the data
     #data = prepare_data(price_df, indicators_df)
 
     # Perform a backtest
-    backtest_signal(data, hurst_entry_exit, market=market, interval=interval, cols=symbols, window_length=window_length, n_jobs=n_jobs)
+    #backtest_signal(data, hurst_entry_exit, market=market, interval=interval, cols=symbols, window_length=window_length, n_jobs=n_jobs, use_log=True)
+    signal  = BacktestSignal(MultiMeanReversion(minimal_time_scale=min_timescale, maximal_time_scale=max_timescale)).backtest(
+                                                                                                                            data,
+                                                                                                                            n_jobs=n_jobs,
+                                                                                                                            cols=symbols,
+                                                                                                                            window_length=window_length,
+                                                                                                                            use_log=use_log,
+                                                                                                                            step=step,
+                                                                                                                            look_a_head=look_a_head,
+                                                                                                                            exit_threshold=exit_thresh,
+                                                                                                                            signal_threshold=entry_thresh
+                                                                                                                        )
 
+    signal  = signal.dropna()
+
+    print(signal)
+
+    pl.figure()
+    pl.hist(signal["success"], bins=np.linspace(signal["success"].min(), signal["success"].max(), np.minimum(100, len(signal))))
+    pl.xlabel("Success")
+    pl.ylabel("Frequency")
+    pl.title("Histogram of Success")
+    pl.grid()
+    pl.show()
 
 
 

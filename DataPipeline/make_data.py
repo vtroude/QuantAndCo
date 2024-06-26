@@ -2,7 +2,7 @@ import os
 
 import pandas   as pd
 
-from typing import Union
+from typing import Union, List
 
 from DataPipeline.fetch_data                import get_time_series
 from DataPipeline.technicals_indicators     import TechnicalIndicators
@@ -72,7 +72,8 @@ def get_and_save_timeseries(
                                 end_time: int,
                                 interval: str = '1m',
                                 chunk: int = 100,
-                                n_jobs: int = 1
+                                n_jobs: int = 1,
+                                datetime_tag: bool = True
                             ) -> None:
     """
     Retrieve time series data as OHLC + Volume Candlesticks withe Datetime index and save
@@ -103,7 +104,7 @@ def get_and_save_timeseries(
     make_directory_structure(market, symbol, interval, "OHLC")
 
 
-    if market == 'forex':
+    if market == 'forex' and datetime_tag:
         start_str, end_str = convert_unix_to_datetime(start_time), convert_unix_to_datetime(end_time)
     else:
         start_str, end_str = start_time, end_time
@@ -170,7 +171,7 @@ def get_and_save_indicators(
 #######################################################################################################################
 
 if __name__ == "__main__":
-    import time
+    #import time
 
     chunk       = 1000
     n_per_chunk = 2500
@@ -187,7 +188,7 @@ if __name__ == "__main__":
     span        = [10, 30, 50, 100, 200, 500, 1000, 2000, 5000, 10_000, 15_000, 20_000, 50_000, 100_000]      # Different windows over which we compute the technical indicators
     stat_span   = [20, 100, 500]    # Different windows over which we compute statistics
 
-    symbols      = ["CHF_USD"]                # Symbol over which we gather the data      'BTCUSDT'
+    symbols      = ["USD_CAD", "USD_HKD"]                # Symbol over which we gather the data      'BTCUSDT'
     market      = "forex"                   # Market from which we gather data          'crypto'
     interval    = ['1m']        # Time interval to make the candlestick
 
@@ -196,7 +197,7 @@ if __name__ == "__main__":
     
     for symbol in symbols:
         for i in interval:
-            get_and_save_timeseries(symbol, market, start_time, end_time, i, chunk, n_jobs=10)
+            get_and_save_timeseries(symbol, market, start_time, end_time, i, chunk, n_jobs=10, datetime_tag=False)
             print(f"Successfully downloaded and save OHLC data for {symbol} at {i} interval")
             #get_and_save_indicators(symbol, market, start_time, end_time, i, span=span, stat_span=stat_span, n_jobs=10)
             #print(f"Successfully downloaded and save TI data for {symbol} at {i} interval")

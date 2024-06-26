@@ -120,6 +120,20 @@ def get_price_data(
 
 #######################################################################################################################
 
+def get_multi_asset_price(symbols: List[str], numerair: str="USD", **kwargs):
+    symbols         = ["AUD_USD", "EUR_USD", "GBP_USD", "USD_CAD", "USD_HKD", "USD_JPY"]
+    data            = pd.concat([get_price_data(symbol=s, **kwargs)["Close"] for s in symbols], axis=1).dropna()
+    data.columns    = symbols
+    for s in symbols:
+        s0, s1  = s.split("_")
+        if numerair.lower() in s0.lower():
+            data[f"{s1}_{s0}"]  = 1./data[s]
+            symbols             = [s_ if s_ != s else f"{s1}_{s0}" for s_ in symbols]
+    
+    return data[symbols]
+
+#######################################################################################################################
+
 def get_data_and_bars(
                         symbol: str,
                         interval: List[str],
